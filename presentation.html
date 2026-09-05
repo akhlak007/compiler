@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLVM Kaleidoscope: Compiler Architecture & Implementation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+  @page {
+    size: 16in 9in;
+    margin: 0;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #090d16;
+    color: #f1f5f9;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .slide {
+    width: 16in;
+    height: 9in;
+    page-break-after: always;
+    break-after: page;
+    position: relative;
+    padding: 0.7in 0.9in 0.6in 0.9in;
+    background: radial-gradient(circle at 10% 10%, #172033 0%, #0a0e1a 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+
+  /* Decorative Glows */
+  .glow-1 {
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(0,0,0,0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .glow-2 {
+    position: absolute;
+    bottom: -150px;
+    left: -150px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, rgba(0,0,0,0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  /* Header */
+  .slide-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.35in;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 0.2in;
+    position: relative;
+    z-index: 2;
+  }
+
+  .slide-header .title-group h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .slide-header .title-group .category {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #38bdf8;
+    margin-bottom: 4px;
+  }
+
+  .badge-tag {
+    background: rgba(56, 189, 248, 0.12);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* Slide Body */
+  .slide-content {
+    flex: 1;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* Footer */
+  .slide-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 0.15in;
+    font-size: 12px;
+    color: #64748b;
+    position: relative;
+    z-index: 2;
+  }
+
+  .footer-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .footer-dot {
+    width: 6px;
+    height: 6px;
+    background: #38bdf8;
+    border-radius: 50%;
+  }
+
+  /* Grids & Cards */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35in;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.3in;
+  }
+
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.25in;
+  }
+
+  .card {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 24px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .icon-blue { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+  .icon-purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+  .icon-green { background: rgba(52, 211, 153, 0.2); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+  .icon-amber { background: rgba(251, 191, 36, 0.2); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
+  .icon-rose { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .card p, .card li {
+    font-size: 14.5px;
+    color: #cbd5e1;
+    line-height: 1.6;
+  }
+
+  .card ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+
+  .card ul li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 8px;
+  }
+
+  .card ul li::before {
+    content: "•";
+    position: absolute;
+    left: 4px;
+    color: #38bdf8;
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+  /* Code Blocks */
+  .code-container {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #e6edf3;
+    overflow: hidden;
+  }
+
+  .code-kw { color: #ff7b72; font-weight: 600; }
+  .code-fn { color: #d2a8ff; font-weight: 600; }
+  .code-type { color: #79c0ff; }
+  .code-num { color: #a5d6ff; }
+  .code-str { color: #a5d6ff; }
+  .code-var { color: #ffa657; }
+  .code-comment { color: #8b949e; font-style: italic; }
+  .code-op { color: #ff7b72; }
+
+  /* Title Slide Specifics */
+  .title-slide {
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at 50% 40%, #1e293b 0%, #0a0e17 80%);
+  }
+
+  .title-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: #38bdf8;
+    padding: 8px 20px;
+    border-radius: 9999px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .hero-title {
+    font-size: 58px;
+    font-weight: 800;
+    line-height: 1.15;
+    color: #ffffff;
+    margin-bottom: 20px;
+    letter-spacing: -1.5px;
+    background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-subtitle {
+    font-size: 22px;
+    color: #94a3b8;
+    max-width: 900px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+
+  .meta-pills {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+  }
+
+  .pill {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 22px;
+    border-radius: 12px;
+    font-size: 14px;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pill strong {
+    color: #ffffff;
+  }
+
+  /* Table styling */
+  .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+
+  .custom-table th {
+    background: rgba(15, 23, 42, 0.8);
+    color: #38bdf8;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 2px solid rgba(56, 189, 248, 0.3);
+    font-weight: 700;
+  }
+
+  .custom-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    color: #cbd5e1;
+  }
+
+  .custom-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  .status-pass {
+    background: rgba(52, 211, 153, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+  }
+
+  .status-pending {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+  }
+
+  .status-no {
+    background: rgba(244, 63, 94, 0.15);
+    color: #fb7185;
+    border: 1px solid rgba(244, 63, 94, 0.3);
+  }
+
+  /* Diagram SVGs */
+  .diagram-svg {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+  }
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: Title Slide -->
+<section class="slide title-slide">
+  <div class="glow-1"></div>
+  <div class="glow-2"></div>
+  <div class="title-badge">⚡ Advanced Compiler Engineering</div>
+  <h1 class="hero-title">LLVM Kaleidoscope<br>Compiler Architecture & Implementation</h1>
+  <p class="hero-subtitle">A Comprehensive Deep-Dive into Lexical Analysis, Recursive Descent Parsing, AST Design, Semantic Scoping, and LLVM IR Generation</p>
+  
+  <div class="meta-pills">
+    <div class="pill">📁 <strong>Repository:</strong> llvm-kaleidoscope</div>
+    <div class="pill">⚙️ <strong>Backend:</strong> LLVM IR Builder & Core API</div>
+    <div class="pill">💻 <strong>Language:</strong> C++14 / Modern OOP</div>
+    <div class="pill">🎯 <strong>Topic:</strong> Compiler Frontend & IR Lowering</div>
+  </div>
+</section>
+
+<!-- SLIDE 2: Project Overview & Motivation -->
+<section class="slide">
+  <div class="glow-1"></div>
+  <div class="slide-header">
+    <div class="title-group">
+      <div class="category">Introduction & Scope</div>
+      <h2>Project Motivation & Objectives</h2>
+    </div>
+    <div class="badge-tag">Executive Summary</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-blue">🎯</div>
+          <div class="card-title">What is Kaleidoscope?</div>
+        </div>
+        <p>A procedural toy language designed to demonstrate complete compiler frontend architecture using the LLVM infrastructure.</p>
+        <ul style="margin-top: 14px;">
+          <li>All numerical data are 64-bit IEEE floating point (<code>double</code>)</li>
+          <li>First-class function definitions with <code>def</code></li>
+          <li>C-style standard library binding with <code>extern</code></li>
+          <li>Pure expression-based syntax</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-purple">🏗️</div>
+          <div class="card-title">Engineering Goals</div>
+        </div>
+        <p>Transition from language theory to practical, modular C++ implementation with LLVM toolchains:</p>
+        <ul style="margin-top: 14px;">
+          <li>High-speed tokenization without external tools (Flex/Lex)</li>
+          <li>Recursive Descent with Operator-Precedence parsing</li>
+          <li>Object-Oriented Abstract Syntax Tree (AST)</li>
+          <li>Direct translation to verified Static Single Assignment (SSA) LLVM IR</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-green">📦</div>
+          <div class="card-title">Codebase Structure</div>
+        </div>
+        <p>Refactored into clean, single-responsibility C++ translation units:</p>
+        <ul style="margin-top: 14px;">
+          <li><code>lexer/</code>: Token definitions and stream scanner</li>
+          <li><code>ast/</code>: 7 modular polymorphic AST class definitions</li>
+          <li><code>parser/</code>: Binary precedence & grammar engine</li>
+          <li><code>kaleidoscope/</code>: LLVM Context, Module, and Builder</li>
+          <li><code>logger/</code>: Error reporting and recovery</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
+    <div>Slide 2 / 12</div>
+  </div>
+</section>
+
+<!-- SLIDE 3: Compiler Architecture & Flowchart -->
+<section class="slide">
+  <div class="glow-1"></div>
+  <div class="slide-header">
+    <div class="title-group">
+      <div class="category">System Architecture</div>
+      <h2>High-Level Compiler Pipeline</h2>
+    </div>
+    <div class="badge-tag">End-to-End Pipeline</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="card" style="padding: 16px; margin-bottom: 20px;">
+      <svg class="diagram-svg" viewBox="0 0 1100 230" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="gradBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0284c7"/>
+            <stop offset="100%" stop-color="#0369a1"/>
+          </linearGradient>
+          <linearGradient id="gradPurple" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#7c3aed"/>
+            <stop offset="100%" stop-color="#5b21b6"/>
+          </linearGradient>
+          <linearGradient id="gradTeal" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0d9488"/>
+            <stop offset="100%" stop-color="#0f766e"/>
+          </linearGradient>
+          <linearGradient id="gradAmber" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#d97706"/>
+            <stop offset="100%" stop-color="#b45309"/>
+          </linearGradient>
+          <linearGradient id="gradGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#16a34a"/>
+            <stop offset="100%" stop-color="#15803d"/>
+          </linearGradient>
+          <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+            <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#000" flood-opacity="0.4"/>
+          </filter>
+        </defs>
+
+        <!-- Stage 1: Input -->
+        <g filter="url(#shadow)">
+          <rect x="20" y="55" width="160" height="110" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+          <text x="100" y="90" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="700" letter-spacing="1">STAGE 1</text>
+          <text x="100" y="115" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">Source Code</text>
+          <text x="100" y="140" text-anchor="middle" fill="#38bdf8" font-family="monospace" font-size="12">stdin / REPL</text>
+        </g>
+
+        <!-- Arrow 1 -->
+        <path d="M 180 110 L 225 110" stroke="#38bdf8" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+        <polygon points="230,110 220,105 220,115" fill="#38bdf8"/>
+
+        <!-- Stage 2: Lexer -->
+        <g filter="url(#shadow)">
+          <rect x="235" y="55" width="170" height="110" rx="12" fill="url(#gradBlue)" stroke="#38bdf8" stroke-width="1.5"/>
+          <text x="320" y="90" text-anchor="middle" fill="#bae6fd" font-size="12" font-weight="700" letter-spacing="1">STAGE 2</text>
+          <text x="320" y="115" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">Lexer (Scanner)</text>
+          <text x="320" y="140" text-anchor="middle" fill="#e0f2fe" font-size="12">gettok() → Tokens</text>
+        </g>
+
+        <!-- Arrow 2 -->
+        <path d="M 405 110 L 450 110" stroke="#38bdf8" stroke-width="3" fill="none"/>
+        <polygon points="455,110 445,105 445,115" fill="#38bdf8"/>
+
+        <!-- Stage 3: Parser & AST -->
+        <g filter="url(#shadow)">
+          <rect x="460" y="55" width="180" height="110" rx="12" fill="url(#gradPurple)" stroke="#c084fc" stroke-width="1.5"/>
+          <text x="550" y="90" text-anchor="middle" fill="#e9d5ff" font-size="12" font-weight="700" letter-spacing="1">STAGE 3</text>
+          <text x="550" y="115" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">Parser + Precedence</text>
+          <text x="550" y="140" text-anchor="middle" fill="#f3e8ff" font-size="12">Generates AST Nodes</text>
+        </g>
+
+        <!-- Arrow 3 -->
+        <path d="M 640 110 L 685 110" stroke="#c084fc" stroke-width="3" fill="none"/>
+        <polygon points="690,110 680,105 680,115" fill="#c084fc"/>
+
+        <!-- Stage 4: Semantic Analysis / IRBuilder -->
+        <g filter="url(#shadow)">
+          <rect x="695" y="55" width="180" height="110" rx="12" fill="url(#gradTeal)" stroke="#2dd4bf" stroke-width="1.5"/>
+          <text x="785" y="90" text-anchor="middle" fill="#ccfbf1" font-size="12" font-weight="700" letter-spacing="1">STAGE 4</text>
+          <text x="785" y="115" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">Codegen (LLVM IR)</text>
+          <text x="785" y="140" text-anchor="middle" fill="#f0fdfa" font-size="12">NamedValues + Builder</text>
+        </g>
+
+        <!-- Arrow 4 -->
+        <path d="M 875 110 L 915 110" stroke="#2dd4bf" stroke-width="3" fill="none"/>
+        <polygon points="920,110 910,105 910,115" fill="#2dd4bf"/>
+
+        <!-- Stage 5: Verified Module Output -->
+        <g filter="url(#shadow)">
+          <rect x="925" y="55" width="160" height="110" rx="12" fill="url(#gradGreen)" stroke="#4ade80" stroke-width="1.5"/>
+          <text x="1005" y="90" text-anchor="middle" fill="#dcfce7" font-size="12" font-weight="700" letter-spacing="1">STAGE 5</text>
+          <text x="1005" y="115" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">LLVM Module</text>
+          <text x="1005" y="140" text-anchor="middle" fill="#f0fdf4" font-size="12">verifyFunction()</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="grid-2">
+      <div class="card" style="padding: 16px 20px;">
+        <div class="card-title" style="font-size: 15px; color: #38bdf8; margin-bottom: 8px;">🔄 Interactive REPL Driver</div>
+        <p style="font-size: 13.5px;">The driver in <code>main.cpp</code> operates in a continuous loop, classifying user input into definitions, extern declarations, or immediate top-level expressions wrapped in anonymous functions.</p>
+      </div>
+      <div class="card" style="padding: 16px 20px;">
+        <div class="card-title" style="font-size: 15px; color: #34d399; margin-bottom: 8px;">🛡️ Verifier & Integrity Guard</div>
+        <p style="font-size: 13.5px;">Every function generated is checked by LLVM's <code>verifyFunction</code> pass, catching type mismatches, invalid basic block terminations, or unassigned SSA registers.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
+    <div>Slide 3 / 12</div>
+  </div>
+</section>
+
+<!-- SLIDE 4: Lexer Design & Tokenization -->
+<section class="slide">
+  <div class="glow-2"></div>
+  <div class="slide-header">
+    <div class="title-group">
+      <div class="category">Frontend Stage 1</div>
+      <h2>Lexical Analysis (Lexer Design)</h2>
+    </div>
+    <div class="badge-tag">lexer/lexer.cpp</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-blue">🔍</div>
+          <div class="card-title">Scanner Architecture</div>
+        </div>
+        <p>The lexer is implemented as a stateful character-by-character scanner in <code>lexer.cpp</code> driven by <code>gettok()</code>.</p>
+        
+        <ul style="margin-top: 12px;">
+          <li><strong>Whitespace Filtration:</strong> Automatically skips spaces, tabs, and linebreaks via <code>isspace()</code>.</li>
+          <li><strong>Identifier & Keyword Buffer:</strong> Accumulates alphanumeric characters into <code>IdentifierStr</code>. Returns <code>tok_def</code>, <code>tok_extern</code>, or <code>tok_identifier</code>.</li>
+          <li><strong>Numeric Literal Processing:</strong> Matches continuous digit sequences and decimal points into <code>NumVal</code> via <code>strtod()</code>.</li>
+          <li><strong>Comment Stripping:</strong> Scans from <code>#</code> to end-of-line and recursively requests next token.</li>
+          <li><strong>Operator Passthrough:</strong> Returns unknown characters (e.g. <code>+</code>, <code>*</code>, <code>(</code>) as their raw ASCII integer value [0–255].</li>
+        </ul>
+      </div>
+
+      <div class="code-container">
+        <div class="code-comment">// Token Enumeration in lexer/token.h</div>
+        <span class="code-kw">enum</span> <span class="code-type">Token</span> {<br>
+        &nbsp;&nbsp;tok_eof = <span class="code-num">-1</span>,<br>
+        &nbsp;&nbsp;<span class="code-comment">// Commands</span><br>
+        &nbsp;&nbsp;tok_def = <span class="code-num">-2</span>,<br>
+        &nbsp;&nbsp;tok_extern = <span class="code-num">-3</span>,<br>
+        &nbsp;&nbsp;<span class="code-comment">// Primary Entities</span><br>
+        &nbsp;&nbsp;tok_identifier = <span class="code-num">-4</span>,<br>
+        &nbsp;&nbsp;tok_number = <span class="code-num">-5</span><br>
+        };<br><br>
+        <div class="code-comment">// Scanning Logic in lexer/lexer.cpp</div>
+        <span class="code-kw">if</span> (isalpha(LastChar)) {<br>
+        &nbsp;&nbsp;IdentifierStr = LastChar;<br>
+        &nbsp;&nbsp;<span class="code-kw">while</span> (isalnum(LastChar = getchar()))<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;IdentifierStr += LastChar;<br><br>
+        &nbsp;&nbsp;<span class="code-kw">if</span> (IdentifierStr == <span class="code-str">"def"</span>) <span class="code-kw">return</span> tok_def;<br>
+        &nbsp;&nbsp;<span class="code-kw">if</span> (IdentifierStr == <span class="code-str">"extern"</span>) <span class="code-kw">return</span> tok_extern;<br>
+        &nbsp;&nbsp;<span class="code-kw">return</span> tok_identifier;<br>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
+    <div>Slide 4 / 12</div>
+  </div>
+</section>
+
+<!-- SLIDE 5: Parser Design & Operator Precedence -->
+<section class="slide">
+  <div class="glow-1"></div>
+  <div class="slide-header">
+    <div class="title-group">
+      <div class="category">Frontend Stage 2</div>
+      <h2>Parser Architecture & Operator Precedence</h2>
+    </div>
+    <div class="badge-tag">parser/parser.cpp</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-purple">🌳</div>
+          <div class="card-title">Operator Precedence Parsing</div>
+        </div>
+        <p>Kaleidoscope utilizes a hybrid <strong>Recursive Descent Parser</strong> for grammar rules combined with an <strong>Operator-Precedence Climbing</strong> algorithm for mathematical binary expressions.</p>
+
+        <div style="background: rgba(15, 23, 42, 0.6); border-radius: 10px; padding: 12px; margin: 14px 0;">
+          <div style="font-weight: 700; color: #38bdf8; font-size: 13px; margin-bottom: 6px;">Precedence Hierarchy Table</div>
+          <div style="display: flex; gap: 12px; font-size: 13px;">
+            <span style="background: rgba(56, 189, 248, 0.15); padding: 4px 10px; border-radius: 6px;"><code>&lt;</code> : Priority 10</span>
+            <span style="background: rgba(56, 189, 248, 0.15); padding: 4px 10px; border-radius: 6px;"><code>+</code>, <code>-</code> : Priority 20</span>
+            <span style="background: rgba(56, 189, 248, 0.15); padding: 4px 10px; border-radius: 6px;"><code>*</code> : Priority 40</span>
+          </div>
+        </div>
+
+        <ul style="font-size: 13.5px;">
+          <li><code>ParsePrimary()</code> routes tokens to numbers, parenthesized expressions, or variables/function calls.</li>
+          <li><code>ParseBinOpRHS()</code> dynamically groups subtrees based on comparative token precedence.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-blue">📊</div>
+          <div class="card-title">Parsing: <code>a + b * c</code> Expression Tree</div>
+        </div>
+        
+        <svg viewBox="0 0 450 200" style="width: 100%; height: auto;">
+          <!-- Node Root (+) -->
+          <circle cx="225" cy="40" r="22" fill="#0284c7" stroke="#38bdf8" stroke-width="2"/>
+          <text x="225" y="46" text-anchor="middle" fill="#fff" font-weight="bold" font-size="18">+</text>
+          
+          <!-- Edge to LHS -->
+          <line x1="210" y1="55" x2="130" y2="105" stroke="#64748b" stroke-width="2"/>
+          <!-- Node LHS (a) -->
+          <circle cx="120" cy="115" r="20" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+          <text x="120" y="120" text-anchor="middle" fill="#cbd5e1" font-weight="bold" font-size="14">a</text>
+          
+          <!-- Edge to RHS (*) -->
+          <line x1="240" y1="55" x2="315" y2="105" stroke="#64748b" stroke-width="2"/>
+          <!-- Node RHS (*) -->
+          <circle cx="325" cy="115" r="22" fill="#7c3aed" stroke="#c084fc" stroke-width="2"/>
+          <text x="325" y="121" text-anchor="middle" fill="#fff" font-weight="bold" font-size="18">*</text>
+          
+          <!-- Sub Edges -->
+          <line x1="310" y1="130" x2="265" y2="165" stroke="#64748b" stroke-width="2"/>
+          <line x1="340" y1="130" x2="385" y2="165" stroke="#64748b" stroke-width="2"/>
+          
+          <!-- Leaf b -->
+          <circle cx="255" cy="170" r="18" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+          <text x="255" y="175" text-anchor="middle" fill="#cbd5e1" font-weight="bold" font-size="13">b</text>
+
+          <!-- Leaf c -->
+          <circle cx="395" cy="170" r="18" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+          <text x="395" y="175" text-anchor="middle" fill="#cbd5e1" font-weight="bold" font-size="13">c</text>
+        </svg>
+
+        <p style="font-size: 13px; color: #94a3b8; text-align: center; margin-top: 6px;">
+          Operator precedence ensures <code>*</code> binds tighter to <code>b</code> and <code>c</code>, forming the subtree before attaching to <code>+</code>.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
+    <div>Slide 5 / 12</div>
+  </div>
+</section>
+
+<!-- SLIDE 6: Abstract Syntax Tree (AST) Structure -->
+<section class="slide">
+  <div class="glow-2"></div>
+  <div class="slide-header">
+    <div class="title-group">
+      <div class="category">Internal Representation</div>
+      <h2>Abstract Syntax Tree (AST) Class Hierarchy</h2>
+    </div>
+    <div class="badge-tag">ast/ Directory</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="grid-4">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-blue">1</div>
+          <div class="card-title" style="font-size: 16px;">NumberExprAST</div>
+        </div>
+        <p style="font-size: 13.5px;">Captures numeric constants like <code>42.0</code>.</p>
+        <div class="code-container" style="margin-top: 10px; padding: 8px; font-size: 11.5px;">
+          <span class="code-type">double</span> Val;<br>
+          <span class="code-fn">codegen</span>();
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-purple">2</div>
+          <div class="card-title" style="font-size: 16px;">VariableExprAST</div>
+        </div>
+        <p style="font-size: 13.5px;">References bound arguments (e.g. <code>x</code>).</p>
+        <div class="code-container" style="margin-top: 10px; padding: 8px; font-size: 11.5px;">
+          <span class="code-type">string</span> Name;<br>
+          <span class="code-fn">codegen</span>();
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-green">3</div>
+          <div class="card-title" style="font-size: 16px;">BinaryExprAST</div>
+        </div>
+        <p style="font-size: 13.5px;">Represents operations: <code>LHS op RHS</code>.</p>
+        <div class="code-container" style="margin-top: 10px; padding: 8px; font-size: 11.5px;">
+          <span class="code-type">char</span> Op;<br>
+          <span class="code-type">unique_ptr</span> LHS, RHS;
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-amber">4</div>
+          <div class="card-title" style="font-size: 16px;">CallExprAST</div>
+        </div>
+        <p style="font-size: 13.5px;">Represents invocations: <code>sin(x, y)</code>.</p>
+        <div class="code-container" style="margin-top: 10px; padding: 8px; font-size: 11.5px;">
+          <span class="code-type">string</span> Callee;<br>
+          <span class="code-type">vector</span> Args;
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top: 20px;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-rose">5</div>
+          <div class="card-title" style="font-size: 16px;">PrototypeAST</div>
+        </div>
+        <p style="font-size: 13.5px;">Captures function metadata: signature name and parameter identifiers list. Emits <code>llvm::Function*</code> declarations.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-blue">6</div>
+          <div class="card-title" style="font-size: 16px;">FunctionAST</div>
+        </div>
+        <p style="font-size: 13.5px;">Combines a <code>PrototypeAST</code> with a body <code>ExprAST</code>. Manages the function entry basic block and populates argument symbol tables.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
+    <div>Slide 6 / 12</div>
+  </div>
+</section>
+
+<!-- SLIDE 7: Semantic Analysis & Symbol Scoping -->
+<section class="slide">
+  <div class="glow-1"></div>
+  <div class="slide-header">
+    <div class="title-group">
+      <div class="category">Semantic Validation</div>
+      <h2>Semantic Analysis & Scope Resolution</h2>
+    </div>
+    <div class="badge-tag">Symbol Table & Type Strategy</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-blue">📋</div>
+          <div class="card-title">Symbol Table Management</div>
+        </div>
+        <p>Managed globally via <code>NamedValues</code> map:</p>
+        <div class="code-container" style="margin: 10px 0; font-size: 12px;">
+          <span class="code-type">std::map</span>&lt;<span class="code-type">string</span>, <span class="code-type">llvm::Value*</span>&gt;<br>
+          NamedValues;
+        </div>
+        <ul style="font-size: 13px;">
+          <li>Scoped per function definition</li>
+          <li>Cleared upon each new function body compilation</li>
+          <li>Populated with named function formal parameters</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-purple">🎯</div>
+          <div class="card-title">Type Checking & Domain</div>
+        </div>
+        <p>Kaleidoscope enforces a unified floating-point model:</p>
+        <ul style="margin-top: 10px; font-size: 13px;">
+          <li>All numerical expressions resolve to <code>Type::getDoubleTy(TheContext)</code>.</li>
+          <li>Boolean comparisons (<code>&lt;</code>) evaluate to 1-bit int and are immediately cast to <code>double</code> via <code>CreateUIToFP</code>.</li>
+          <li>Arity verification: Function call argument count is strictly verified against prototype signature.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-rose">🛡️</div>
+          <div class="card-title">Error Recovery Strategy</div>
+        </div>
+        <p>Robust logging prevents compiler crashes:</p>
+        <ul style="margin-top: 10px; font-size: 13px;">
+          <li><code>LogError</code>: Emits syntax errors to <code>stderr</code> and returns <code>nullptr</code>.</li>
+          <li><code>LogErrorV</code>: Catches unknown variables or incorrect argument counts during codegen.</li>
+          <li>If codegen fails, <code>TheFunction->eraseFromParent()</code> rolls back partial LLVM IR to maintain module integrity.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
+    <div>Slide 7 / 12</div>
+  </div>
+</section>
+
+<!-- SLIDE 8: LLVM Intermediate Representation (IR) Strategy -->
+<section class="slide">
+  <div class="glow-2"></div>
+  <div class="slide-header">
+    <div class="title-group">
+      <div class="category">Backend Lowering</div>
+      <h2>LLVM IR Code Generation Strategy</h2>
+    </div>
+    <div class="badge-tag">LLVM IRBuilder & SSA</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-green">⚙️</div>
+          <div class="card-title">LLVM Core Infrastructure</div>
+        </div>
+        <ul style="font-size: 14px;">
+          <li><strong>LLVMContext (<code>TheContext</code>):</strong> Core environment owning type tables, constant pools, and memory arenas.</li>
+          <li><strong>IRBuilder (<code>Builder</code>):</strong> High-level cursor that inserts instructions into basic blocks and performs constant folding.</li>
+          <li><strong>Module (<code>TheModule</code>):</strong> Top-level container holding compiled functions, symbol tables, and external declarations.</li>
+          <li><strong>SSA Form Guarantee:</strong> Generates instructions directly in Static Single Assignment form without mutable stack allocations.</li>
+        </ul>
+      </div>
+
+      <div class="code-container">
+        <div class="code-comment">// BinaryExprAST::codegen() in ast/BinaryExprAST.cpp</div>
+        <span class="code-type">llvm::Value</span> *<span class="code-fn">BinaryExprAST::codegen</span>() {<br>
+        &nbsp;&nbsp;<span class="code-type">llvm::Value</span> *L = LHS-&gt;codegen();<br>
+        &nbsp;&nbsp;<span class="code-type">llvm::Value</span> *R = RHS-&gt;codegen();<br>
+        &nbsp;&nbsp;<span class="code-kw">if</span> (!L || !R) <span class="code-kw">return</span> <span class="code-kw">nullptr</span>;<br><br>
+        &nbsp;&nbsp;<span class="code-kw">switch</span> (Op) {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-kw">case</span> <span class="code-str">'+'</span>: <span class="code-kw">return</span> Builder.CreateFAdd(L, R, <span class="code-str">"addtmp"</span>);<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-kw">case</span> <span class="code-str">'-'</span>: <span class="code-kw">return</span> Builder.CreateFSub(L, R, <span class="code-str">"subtmp"</span>);<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-kw">case</span> <span class="code-str">'*'</span>: <span class="code-kw">return</span> Builder.CreateFMul(L, R, <span class="code-str">"multmp"</span>);<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-kw">case</span> <span class="code-str">'&lt;'</span>:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L = Builder.CreateFCmpULT(L, R, <span class="code-str">"cmptmp"</span>);<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-kw">return</span> Builder.CreateUIToFP(L, <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;llvm::Type::getDoubleTy(TheContext), <span class="code-str">"booltmp"</span>);<br>
+        &nbsp;&nbsp;}<br>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
+    <div>Slide 8 / 12</div>
+  </div>
+</section>
+
+<!-- SLIDE 9: Step-by-Step Execution Walkthrough -->
+<section class="slide">
+  <div class="glow-1"></div>
+  <div class="slide-header">
+    <div class="title-group">
+      <div class="category">Concrete Trace</div>
+      <h2>Execution Walkthrough: Compiling a Function</h2>
+    </div>
+    <div class="badge-tag">Live Tracing Example</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="card" style="padding: 14px 20px; margin-bottom: 16px; background: rgba(56, 189, 248, 0.08); border-color: rgba(56, 189, 248, 0.25);">
+      <span style="color: #38bdf8; font-weight: 700;">Target Source Input:</span> &nbsp;
+      <code style="font-family: 'JetBrains Mono'; font-size: 15px; color: #ffffff;">def foo(x y) x + y * 4.0;</code>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title" style="font-size: 15px; color: #38bdf8; margin-bottom: 8px;">1. Tokens Generated</div>
+        <div class="code-container" style="font-size: 11.5px;">
+          [tok_def] <span class="code-str">"def"</span><br>
+          [tok_identifier] <span class="code-str">"foo"</span><br>
+          ['(']<br>
+          [tok_identifier] <span class="code-str">"x"</span><br>
+          [tok_identifier] <span class="code-str">"y"</span><br>
+          [')']<br>
+          [tok_identifier] <span class="code-str">"x"</span><br>
+          ['+']<br>
+          [tok_identifier] <span class="code-str">"y"</span><br>
+          ['*']<br>
+          [tok_number] <span class="code-num">4.0</span><br>
+          [';']
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="font-size: 15px; color: #c084fc; margin-bottom: 8px;">2. AST Built</div>
+        <div class="code-container" style="font-size: 11.5px;">
+          FunctionAST(<br>
+          &nbsp;&nbsp;Prototype: foo(x, y),<br>
+          &nbsp;&nbsp;Body: BinaryExprAST(<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;Op: <span class="code-str">'+'</span>,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;LHS: Variable(<span class="code-str">"x"</span>),<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;RHS: BinaryExprAST(<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Op: <span class="code-str">'*'</span>,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LHS: Variable(<span class="code-str">"y"</span>),<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RHS: Number(<span class="code-num">4.0</span>)<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;)<br>
+          &nbsp;&nbsp;)<br>
+          )
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="font-size: 15px; color: #34d399; margin-bottom: 8px;">3. Emitted LLVM IR</div>
+        <div class="code-container" style="font-size: 11.5px;">
+          <span class="code-kw">define</span> <span class="code-type">double</span> <span class="code-fn">@foo</span>(<span class="code-type">double</span> <span class="code-var">%x</span>, <span class="code-type">double</span> <span class="code-var">%y</span>) {<br>
+          <span class="code-fn">entry:</span><br>
+          &nbsp;&nbsp;<span class="code-var">%multmp</span> = <span class="code-kw">fmul</span> <span class="code-type">double</span> <span class="code-var">%y</span>, <span class="code-num">4.000000e+00</span><br>
+          &nbsp;&nbsp;<span class="code-var">%addtmp</span> = <span class="code-kw">fadd</span> <span class="code-type">double</span> <span class="code-var">%x</span>, <span class="code-var">%multmp</span><br>
+          &nbsp;&nbsp;<span class="code-kw">ret</span> <span class="code-type">double</span> <span class="code-var">%addtmp</span><br>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
+    <div>Slide 9 / 12</div>
+  </div>
+</section>
+
+<!-- SLIDE 10: Completeness & Functional Analysis -->
+<section class="slide">
+  <div class="glow-2"></div>
+  <div class="slide-header">
+    <div class="title-group">
+      <div class="category">System Evaluation</div>
+      <h2>Functionality Audit & Gap Analysis</h2>
+    </div>
+    <div class="badge-tag">Current vs. Full Compiler</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="card" style="padding: 16px;">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Compiler Feature</th>
+            <th>Implementation Status</th>
+            <th>Notes & Architectural Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Lexical Analysis & Tokens</strong></td>
+            <td><span class="status-badge status-pass">✓ Completed</span></td>
+            <td>Numbers, identifiers, <code>def</code>, <code>extern</code>, comments (<code>#</code>), ASCII operators.</td>
+          </tr>
+          <tr>
+            <td><strong>Operator Precedence Parser</strong></td>
+            <td><span class="status-badge status-pass">✓ Completed</span></td>
+            <td>Recursive descent climbing for <code>&lt;</code>, <code>+</code>, <code>-</code>, <code>*</code>, calls, parens.</td>
+          </tr>
+          <tr>
+            <td><strong>LLVM IR Code Generation</strong></td>
+            <td><span class="status-badge status-pass">✓ Completed</span></td>
+            <td>Generates valid LLVM SSA instructions with <code>verifyFunction</code> integrity checks.</td>
+          </tr>
+          <tr>
+            <td><strong>JIT Runtime Execution Engine</strong></td>
+            <td><span class="status-badge status-no">✗ Missing</span></td>
+            <td>Top-level expressions emit IR as <code>__anon_expr</code> but are not executed in memory.</td>
+          </tr>
+          <tr>
+            <td><strong>Control Flow (if/then/else, loops)</strong></td>
+            <td><span class="status-badge status-pending">⏳ Planned</span></td>
+            <td>No conditional basic block branching (Tutorial Chapter 5).</td>
+          </tr>
+          <tr>
+            <td><strong>Mutable Variables & Memory</strong></td>
+            <td><span class="status-badge status-pending">⏳ Planned</span></td>
+            <td>No <code>var</code> keyword or memory stack allocations (<code>alloca</code>) (Tutorial Chapter 7).</td>
+          </tr>
+          <tr>
+            <td><strong>PassManager Optimizations</strong></td>
+            <td><span class="status-badge status-pending">⏳ Planned</span></td>
+            <td>No constant folding, dead code elimination, or reassociation passes attached.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
+    <div>Slide 10 / 12</div>
+  </div>
+</section>
+
+<!-- SLIDE 11: Work Plan & Future Roadmap Diagram -->
+<section class="slide">
+  <div class="glow-1"></div>
+  <div class="slide-header">
+    <div class="title-group">
+      <div class="category">Engineering Roadmap</div>
+      <h2>Future Work Plan & Implementation Milestones</h2>
+    </div>
+    <div class="badge-tag">Work Plan Diagram</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="grid-3">
+      <!-- Phase 1 -->
+      <div class="card" style="border-top: 4px solid #38bdf8;">
+        <div class="card-header">
+          <div class="card-icon icon-blue">P1</div>
+          <div>
+            <div class="card-title" style="font-size: 16px;">Phase 1: JIT & Optimization</div>
+            <div style="font-size: 12px; color: #94a3b8;">Milestone 1 • Chapter 4</div>
+          </div>
+        </div>
+        <ul style="font-size: 13.5px;">
+          <li>Integrate <strong>LLVM OrcJIT / LLJIT</strong> to evaluate anonymous expressions immediately.</li>
+          <li>Attach <code>FunctionPassManager</code> with Instruction Combining, GVN, and Reassociate passes.</li>
+          <li>Enable live REPL evaluation.</li>
+        </ul>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="card" style="border-top: 4px solid #c084fc;">
+        <div class="card-header">
+          <div class="card-icon icon-purple">P2</div>
+          <div>
+            <div class="card-title" style="font-size: 16px;">Phase 2: Control Flow & State</div>
+            <div style="font-size: 12px; color: #94a3b8;">Milestone 2 • Chapters 5-7</div>
+          </div>
+        </div>
+        <ul style="font-size: 13.5px;">
+          <li>Implement <code>IfExprAST</code> with conditional branch phi-nodes.</li>
+          <li>Add <code>ForExprAST</code> loop construct.</li>
+          <li>Add mutable local variables with stack <code>alloca</code> and LLVM <code>mem2reg</code> pass.</li>
+        </ul>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="card" style="border-top: 4px solid #34d399;">
+        <div class="card-header">
+          <div class="card-icon icon-green">P3</div>
+          <div>
+            <div class="card-title" style="font-size: 16px;">Phase 3: Native Target Emission</div>
+            <div style="font-size: 12px; color: #94a3b8;">Milestone 3 • Chapters 8-9</div>
+          </div>
+        </div>
+        <ul style="font-size: 13.5px;">
+          <li>Configure target machine triple and data layouts for cross-compilation.</li>
+          <li>Emit native object code (<code>.o</code> / <code>.obj</code>) and link to standalone executables.</li>
+          <li>Add DWARF / CodeView debug symbols.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
+    <div>Slide 11 / 12</div>
+  </div>
+</section>
+
+<!-- SLIDE 12: Conclusion & Q&A -->
+<section class="slide title-slide" style="text-align: center;">
+  <div class="glow-1"></div>
+  <div class="glow-2"></div>
+  <div class="title-badge">🎉 Summary & Wrap-up</div>
+  <h1 class="hero-title" style="font-size: 46px; margin-bottom: 24px;">Thank You! Questions & Discussion</h1>
+  
+  <div class="card" style="max-width: 800px; text-align: left; margin: 0 auto 30px auto; padding: 24px;">
+    <div style="font-weight: 700; color: #38bdf8; font-size: 16px; margin-bottom: 12px;">Key Project Takeaways:</div>
+    <ul style="font-size: 14.5px; color: #cbd5e1;">
+      <li>Clear separation of concerns between Tokenizer, Grammar Parser, and LLVM Backend.</li>
+      <li>Efficient AST architecture with clean polymorphic C++ memory management (<code>std::unique_ptr</code>).</li>
+      <li>Demonstrates direct code generation to industrial-strength, verified LLVM Intermediate Representation.</li>
+    </ul>
+  </div>
+
+  <div class="meta-pills">
+    <div class="pill">📖 <strong>Reference:</strong> llvm.org/docs/tutorial</div>
+    <div class="pill">📁 <strong>Repository:</strong> llvm-kaleidoscope</div>
+  </div>
+</section>
+
+</body>
+</html>

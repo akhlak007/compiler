@@ -1,100 +1,265 @@
-# Kaleidoscope: Implementing a Language with LLVM
+# Kaleidoscope: LLVM-Based Toy Language Compiler
 
-## How to build it
-On MacOS (tested on Ventura 13.0).
-~~~
-# Install llvm (version 15.0)
-brew install llvm@15
+[![Language](https://img.shields.io/badge/Language-C%2B%2B14-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B14)
+[![Backend](https://img.shields.io/badge/Backend-LLVM%20Core%20API-orange.svg)](https://llvm.org/)
+[![Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)]()
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+A modular, extensible C++ implementation of the **Kaleidoscope** programming language frontend and **LLVM Intermediate Representation (IR) Code Generator**, inspired by the official [LLVM Tutorial](https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/index.html).
+
+---
+
+## 📑 Table of Contents
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [System Architecture](#-system-architecture)
+- [Project Layout](#-project-layout)
+- [How It Works: Compilation Stages](#-how-it-works-compilation-stages)
+  - [1. Lexical Analysis (Scanner)](#1-lexical-analysis-scanner)
+  - [2. Syntax Analysis & Operator Precedence Parsing](#2-syntax-analysis--operator-precedence-parsing)
+  - [3. Abstract Syntax Tree (AST) Hierarchy](#3-abstract-syntax-tree-ast-hierarchy)
+  - [4. Semantic Analysis & Symbol Scoping](#4-semantic-analysis--symbol-scoping)
+  - [5. LLVM IR Code Generation](#5-llvm-ir-code-generation)
+- [Building & Installation](#-building--installation)
+  - [Linux / WSL (Ubuntu)](#linux--wsl-ubuntu)
+  - [macOS](#macos)
+- [Interactive Usage (REPL)](#-interactive-usage-repl)
+- [Example Programs & IR Output](#-example-programs--ir-output)
+- [Presentation & Visual Assets](#-presentation--visual-assets)
+- [Roadmap & Future Extensions](#-roadmap--future-extensions)
+- [References & Acknowledgements](#-references--acknowledgements)
+
+---
+
+## 🚀 Overview
+
+**Kaleidoscope** is a procedural language designed to illustrate the internal mechanics of a modern compiler. This implementation breaks down the compiler into clear, decoupled modules across parsing, abstract syntax modeling, symbol scoping, and LLVM IR lowering.
+
+The system reads expressions or function definitions interactively through a Read-Eval-Print Loop (REPL), verifies grammar rules and scoping constraints, and constructs verified LLVM SSA (Static Single Assignment) byte-code.
+
+---
+
+## ✨ Key Features
+
+- **Custom Hand-Written Lexer**: High-performance character stream tokenizer handling keywords, identifiers, numeric literals, comments (`#`), and ASCII operators.
+- **Recursive Descent & Operator Precedence Parser**: Implements operator-precedence climbing for binary math expressions (`<`, `+`, `-`, `*`).
+- **Polymorphic AST**: Clean object-oriented design using modern C++ memory management (`std::unique_ptr`).
+- **LLVM IR Code Generation**: Direct translation of AST nodes to LLVM 64-bit floating-point instructions using `llvm::IRBuilder<>`.
+- **Foreign Function Interface (FFI)**: Support for C standard library bindings via `extern` declarations (e.g. `extern sin(x);`).
+- **Function Integrity Verification**: Automatically runs LLVM's `llvm::verifyFunction` on all compiled units.
+
+---
+
+## 🏗 System Architecture
+
+```mermaid
+flowchart LR
+    A[Source Input\nstdin / REPL] --> B[Lexer\ngettok]
+    B -->|Token Stream| C[Parser\nPrecedence Engine]
+    C -->|Constructs| D[Polymorphic AST\nExprAST Nodes]
+    D -->|codegen| E[LLVM IRBuilder\nSSA Emission]
+    E --> F[LLVM Module\nverifyFunction]
+    F --> G[LLVM IR Output\nstderr]
+```
+
+---
+
+## 📁 Project Layout
+
+```text
+.
+├── ast/                        # Abstract Syntax Tree hierarchy
+│   ├── ExprAST.h               # Base expression interface
+│   ├── NumberExprAST.h/.cpp    # Numeric constant nodes (e.g., 42.0)
+│   ├── VariableExprAST.h/.cpp  # Identifier and argument reference nodes
+│   ├── BinaryExprAST.h/.cpp    # Binary operator nodes (LHS op RHS)
+│   ├── CallExprAST.h/.cpp      # Function call invocation nodes
+│   ├── PrototypeAST.h/.cpp     # Function signature & parameter list
+│   └── FunctionAST.h/.cpp      # Function definition & body container
+├── kaleidoscope/               # LLVM global state & builder bindings
+│   ├── kaleidoscope.h
+│   └── kaleidoscope.cpp
+├── lexer/                      # Lexical analysis & token stream
+│   ├── token.h                 # Token enumeration definitions
+│   ├── lexer.h                 # Lexer public interface
+│   └── lexer.cpp               # Scanner implementation
+├── logger/                     # Diagnostic & error logging helpers
+│   ├── logger.h
+│   └── logger.cpp
+├── parser/                     # Syntax analysis & precedence climber
+│   ├── parser.h
+│   └── parser.cpp
+├── main.cpp                    # Driver entry point & REPL loop
+├── Makefile                    # Build automation script
+├── presentation.html           # Interactive 16:9 Presentation slide deck
+├── Kaleidoscope_Compiler_Presentation.pdf # Exported PDF presentation
+└── README.md                   # Project documentation
+```
+
+---
+
+## 🔬 How It Works: Compilation Stages
+
+### 1. Lexical Analysis (Scanner)
+Located in `lexer/lexer.cpp`, the scanner processes raw characters from standard input:
+- Skips whitespace using `isspace()`.
+- Recognizes language keywords (`def`, `extern`) and identifiers into `IdentifierStr`.
+- Parses numbers into 64-bit `double` (`NumVal`) via `strtod()`.
+- Strips single-line comments starting with `#`.
+
+### 2. Syntax Analysis & Operator Precedence Parsing
+Located in `parser/parser.cpp`, expressions are parsed using an operator precedence table:
+
+| Operator | Precedence Level | Associativity |
+| :---: | :---: | :---: |
+| `<` | `10` | Left-to-Right |
+| `+`, `-` | `20` | Left-to-Right |
+| `*` | `40` | Left-to-Right |
+
+Expressions like `a + b * c` are correctly grouped as `a + (b * c)` before IR emission.
+
+### 3. Abstract Syntax Tree (AST) Hierarchy
+All syntax constructs derive from `ExprAST`:
+- Every AST class implements `virtual llvm::Value *codegen() = 0;`
+- Manages memory through smart pointers (`std::unique_ptr<ExprAST>`).
+
+### 4. Semantic Analysis & Symbol Scoping
+- **Symbol Table (`NamedValues`)**: Maps variable names to their corresponding active `llvm::Value*` within the current function scope.
+- **Type Checking**: All values are unified to 64-bit double-precision floats (`llvm::Type::getDoubleTy(TheContext)`). Comparisons evaluate to booleans and are explicitly zero-extended and cast to floating-point values via `CreateUIToFP`.
+
+### 5. LLVM IR Code Generation
+- Emits clean SSA instructions (`fadd`, `fsub`, `fmul`, `fcmp`, `call`, `ret`).
+- Verifies structural integrity with `llvm::verifyFunction(*TheFunction)`.
+
+---
+
+## 💻 Building & Installation
+
+### Linux / WSL (Ubuntu)
+
+```bash
+# 1. Install LLVM development packages and tools
+sudo apt update
+sudo apt install -y llvm-dev clang make g++
+
+# 2. Build the executable
 make
+
+# 3. Launch the compiler REPL
 ./main
-# This should bring up a simple REPL.
-~~~
+```
 
-## Why?
+### macOS
 
-Self-education...
+```bash
+# 1. Install LLVM via Homebrew
+brew install llvm
 
-I'm interested in LLVM and want to try simple things with it.
-That's why I've started official LLVM tutorial - [Kaleidoscope](http://llvm.org/docs/tutorial).
+# 2. Compile
+make
 
-## What's it all about?
+# 3. Launch REPL
+./main
+```
 
-This tutorial runs through the implementation of a simple language, showing how fun and easy it can be.
-This tutorial will get you up and started as well as help to build a framework you can extend to other languages.
-The code in this tutorial can also be used as a playground to hack on other LLVM specific things.
+---
 
-The goal of this tutorial is to progressively unveil our language, describing how it is built up over time.
-This will let us cover a fairly broad range of language design and LLVM-specific usage issues, showing and explaining the code for it all along the way, without overwhelming you with tons of details up front.
+## 🎮 Interactive Usage (REPL)
 
-It is useful to point out ahead of time that this tutorial is really about teaching compiler techniques and LLVM specifically, not about teaching modern and sane software engineering principles.
-In practice, this means that we’ll take a number of shortcuts to simplify the exposition.
-For example, the code uses global variables all over the place, doesn’t use nice design patterns like visitors, etc... but it is very simple.
-If you dig in and use the code as a basis for future projects, fixing these deficiencies shouldn’t be hard.
+Upon launching `./main`, you will be greeted by the `ready>` prompt:
 
-## How it works all together?
+```text
+ready> def square(x) x * x;
+Read function definition:
+define double @square(double %x) {
+entry:
+  %multmp = fmul double %x, %x
+  ret double %multmp
+}
 
-### Lexer
-
-The first thing here is a lexer.
-Lexer is responsible for getting a stream of chars and translating it into a groups of tokens.
-
-> A lexer is a software program that performs lexical analysis. Lexical analysis is the process of separating a stream of characters into different words, which in computer science we call 'tokens'.
-
-Tokens identifiers are stored under `lexer/token.h` file and lexer implementation under `lexer/lexer.cpp` file.
-
-Tokens are just an `enum` structure, which consists of token identifier and a number assigned to this token.
-This way, we can identify tokens through lexical analysis.
-
-The actual reading of a stream is implemented in `lexer/lexer.cpp` file.
-Function `gettok` reads characters one-by-one from `stdin` and groups them in tokens.
-So, basically, `gettok` function reads characters and returns numbers (tokens).
-
-Further, we can use these tokens in parser (semantic analysis).
-
-### AST (Abstract Syntax Tree)
-
-Though, before diving into the parser, we need to implement AST nodes, that we can use during parsing.
-
-Basic block of each AST node is `ExprAST` node, which is stored under `ast/ExprAST.h` file.
-All other nodes are extends from `ExprAST` node.
-
-Each of AST nodes must implement one method - `codegen()`.
-`codegen()` method is responsible for generating LLVM IR, using LLVM IRBuilder API, that's all.
-
-As you can see in `ast` folder, we have implemented the following AST nodes with appropriate code generation into LLVM IR:
-
-- Binary Expressions;
-- Call Expressions;
-- Function Expressions;
-- Number Expressions;
-- Prototype Expressions;
-- Variable Expressions;
-
-Each of these nodes have a constructor where all mandatory values are initialized.
-Based on that information, `codegen()` can build LLVM IR, usine these values.
-
-The simplest one, i.e. is Number Expression.
-`codegen()` for number expression just calls appropriate method in LLVM IR Builder:
-
-```c++
-llvm::Value *NumberExprAST::codegen() {
-  return llvm::ConstantFP::get(TheContext, llvm::APFloat(Val));
+ready> 4 + 5 * 2;
+Read top-level expression:
+define double @__anon_expr() {
+entry:
+  %multmp = fmul double 5.000000e+00, 2.000000e+00
+  %addtmp = fadd double 4.000000e+00, %multmp
+  ret double %addtmp
 }
 ```
 
-Now, we have two parts of a compiler which we can combine.
+Press `Ctrl + D` (or `EOF`) to exit. The compiler will output the complete generated LLVM Module.
 
-### Parser
+---
 
-Parser is where lexer and AST are combined together.
-The actual implementation of a parser stores into `parser/parser.cpp` file.
+## 🧪 Example Programs & IR Output
 
-Parser uses lexer for getting a stream of tokens, which are used for building an AST, using our AST implementation.
+### Function Definitions & Calls
+```kaleidoscope
+def average(a b) (a + b) * 0.5;
+```
+**Generated LLVM IR:**
+```llvm
+define double @average(double %a, double %b) {
+entry:
+  %addtmp = fadd double %a, %b
+  %multmp = fmul double %addtmp, 5.000000e-01
+  ret double %multmp
+}
+```
 
-So, in general, when parser sees a known token, i.e. number token, it tries to create a `NumberExprAST` node.
+### Foreign Function Declarations (FFI)
+```kaleidoscope
+extern sin(x);
+extern cos(x);
 
-When parsing is done, got the last character/token from the stream, we have an AST representation of our code.
-We can use it and generate LLVM IR from our AST using `codegen()` method in each AST node.
+def trig_identity(x) sin(x) * sin(x) + cos(x) * cos(x);
+```
+**Generated LLVM IR:**
+```llvm
+declare double @sin(double)
+declare double @cos(double)
 
-This process is done in `main.cpp` file.
-`main.cpp` file is the place where all the parts are combined in one place.
+define double @trig_identity(double %x) {
+entry:
+  %calltmp = call double @sin(double %x)
+  %calltmp1 = call double @sin(double %x)
+  %multmp = fmul double %calltmp, %calltmp1
+  %calltmp2 = call double @cos(double %x)
+  %calltmp3 = call double @cos(double %x)
+  %multmp4 = fmul double %calltmp2, %calltmp3
+  %addtmp = fadd double %multmp, %multmp4
+  ret double %addtmp
+}
+```
+
+---
+
+## 📊 Presentation & Visual Assets
+
+This repository includes a 12-slide presentation covering the compiler's architecture, flowcharts, AST design, and work plan:
+
+- 📄 **PDF Slide Deck**: [`Kaleidoscope_Compiler_Presentation.pdf`](Kaleidoscope_Compiler_Presentation.pdf)
+- 🌐 **Interactive Web Deck**: [`presentation.html`](presentation.html)
+
+---
+
+## 🗺 Roadmap & Future Extensions
+
+- [ ] **Phase 1: JIT Engine & Optimization Passes**
+  - Integrate `llvm::orc::LLJIT` for real-time in-memory expression evaluation.
+  - Attach `llvm::FunctionPassManager` with instruction combination and dead code elimination passes.
+- [ ] **Phase 2: Control Flow & Memory**
+  - Implement `IfExprAST` and phi-node branches for `if/then/else`.
+  - Add `ForExprAST` loop construct.
+  - Implement mutable variables using stack allocation (`alloca`) and `mem2reg`.
+- [ ] **Phase 3: Native Compilation & Tooling**
+  - Cross-compilation to native object files (`.o` / `.obj`).
+  - Add DWARF / CodeView debug metadata.
+
+---
+
+## 📚 References & Acknowledgements
+
+- [LLVM Tutorial: My First Language Frontend](https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/index.html)
+- [LLVM Programmer's Manual](https://llvm.org/docs/ProgrammersManual.html)
+- [LLVM Doxygen Documentation](https://llvm.org/doxygen/)
