@@ -17,7 +17,7 @@ int gettok() {
     LastChar = getchar();
   }
 
-  // Next thing is recognize identifier and specific keywords like "def"
+  // Next thing is recognize identifier and specific language keywords
   if (isalpha(LastChar)) {
     IdentifierStr = LastChar;
 
@@ -26,12 +26,42 @@ int gettok() {
       IdentifierStr += LastChar;
     }
 
+    // Commands / Function definitions
     if (IdentifierStr == "def") {
       return tok_def;
     }
-
     if (IdentifierStr == "extern") {
       return tok_extern;
+    }
+
+    // Control Flow (Conditionals & Loops)
+    if (IdentifierStr == "if") {
+      return tok_if;
+    }
+    if (IdentifierStr == "then") {
+      return tok_then;
+    }
+    if (IdentifierStr == "else") {
+      return tok_else;
+    }
+    if (IdentifierStr == "for") {
+      return tok_for;
+    }
+    if (IdentifierStr == "in") {
+      return tok_in;
+    }
+
+    // User-Defined Operators
+    if (IdentifierStr == "binary") {
+      return tok_binary;
+    }
+    if (IdentifierStr == "unary") {
+      return tok_unary;
+    }
+
+    // Mutable Local Variables
+    if (IdentifierStr == "var") {
+      return tok_var;
     }
 
     return tok_identifier;
@@ -47,7 +77,7 @@ int gettok() {
     } while (isdigit(LastChar) || LastChar == '.');
 
     // Convert numeric string to numeric value
-    // that we are store in NumVal
+    // that we store in NumVal
     NumVal = strtod(NumStr.c_str(), 0);
     return tok_number;
   }

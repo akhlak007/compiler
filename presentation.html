@@ -531,91 +531,94 @@
 
   <div class="slide-content">
     <div class="grid-2">
-      <div class="card" style="padding: 16px;">
-        <div class="card-title" style="font-size: 15px; color: #38bdf8; margin-bottom: 10px;">Token Enumeration & Value Mapping</div>
-        <table class="custom-table" style="font-size: 12px;">
+      <div class="card" style="padding: 14px;">
+        <div class="card-title" style="font-size: 14.5px; color: #38bdf8; margin-bottom: 8px;">Complete Language Token Mapping</div>
+        <table class="custom-table" style="font-size: 11px;">
           <thead>
             <tr>
               <th>Token Category</th>
               <th>Enum Identifier</th>
               <th>Value</th>
-              <th>Lexer Match Pattern</th>
+              <th>Lexer Match Pattern / Keyword</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><strong>EOF Token</strong></td>
+              <td><strong>EOF / Stream</strong></td>
               <td><code>tok_eof</code></td>
               <td><code>-1</code></td>
               <td>End-of-File stream (<code>EOF</code>)</td>
             </tr>
             <tr>
-              <td><strong>Command: Def</strong></td>
-              <td><code>tok_def</code></td>
-              <td><code>-2</code></td>
-              <td>Keyword <code>"def"</code></td>
+              <td><strong>Function Defs</strong></td>
+              <td><code>tok_def</code>, <code>tok_extern</code></td>
+              <td><code>-2, -3</code></td>
+              <td>Keywords <code>"def"</code>, <code>"extern"</code></td>
             </tr>
             <tr>
-              <td><strong>Command: Extern</strong></td>
-              <td><code>tok_extern</code></td>
-              <td><code>-3</code></td>
-              <td>Keyword <code>"extern"</code></td>
+              <td><strong>Primary Entities</strong></td>
+              <td><code>tok_identifier</code>, <code>tok_number</code></td>
+              <td><code>-4, -5</code></td>
+              <td><code>[a-zA-Z0-9]+</code>, <code>[0-9.]+</code> (&rarr; <code>double</code>)</td>
             </tr>
             <tr>
-              <td><strong>Identifier</strong></td>
-              <td><code>tok_identifier</code></td>
-              <td><code>-4</code></td>
-              <td><code>[a-zA-Z][a-zA-Z0-9]*</code> &rarr; <code>IdentifierStr</code></td>
+              <td><strong>Control Flow</strong></td>
+              <td><code>tok_if</code>, <code>tok_then</code>, <code>tok_else</code></td>
+              <td><code>-6, -7, -8</code></td>
+              <td>Keywords <code>"if"</code>, <code>"then"</code>, <code>"else"</code></td>
             </tr>
             <tr>
-              <td><strong>Numeric Literal</strong></td>
-              <td><code>tok_number</code></td>
-              <td><code>-5</code></td>
-              <td><code>[0-9.]+</code> &rarr; <code>NumVal (double)</code></td>
+              <td><strong>Loop Constructs</strong></td>
+              <td><code>tok_for</code>, <code>tok_in</code></td>
+              <td><code>-9, -10</code></td>
+              <td>Keywords <code>"for"</code>, <code>"in"</code></td>
             </tr>
             <tr>
-              <td><strong>Binary Operators</strong></td>
+              <td><strong>Custom Operators</strong></td>
+              <td><code>tok_binary</code>, <code>tok_unary</code></td>
+              <td><code>-11, -12</code></td>
+              <td>Keywords <code>"binary"</code>, <code>"unary"</code></td>
+            </tr>
+            <tr>
+              <td><strong>Mutable Variables</strong></td>
+              <td><code>tok_var</code></td>
+              <td><code>-13</code></td>
+              <td>Keyword <code>"var"</code></td>
+            </tr>
+            <tr>
+              <td><strong>Operators & Delims</strong></td>
               <td>ASCII direct</td>
               <td><code>[0-255]</code></td>
-              <td><code>+</code> (43), <code>-</code> (45), <code>*</code> (42), <code>&lt;</code> (60)</td>
-            </tr>
-            <tr>
-              <td><strong>Delimiters</strong></td>
-              <td>ASCII direct</td>
-              <td><code>[0-255]</code></td>
-              <td><code>(</code> (40), <code>)</code> (41), <code>,</code> (44), <code>;</code> (59)</td>
-            </tr>
-            <tr>
-              <td><strong>Comments</strong></td>
-              <td>Ignored</td>
-              <td>N/A</td>
-              <td><code>#.*[\r\n]</code> (Skipped to next token)</td>
+              <td><code>+ - * / < > = ( ) { } , ;</code></td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <div class="code-container" style="font-size: 12px;">
+      <div class="code-container" style="font-size: 11px;">
         <div class="code-comment">// Complete Token Definitions in lexer/token.h</div>
         <span class="code-kw">enum</span> <span class="code-type">Token</span> {<br>
         &nbsp;&nbsp;tok_eof = <span class="code-num">-1</span>,<br>
-        &nbsp;&nbsp;<span class="code-comment">// Commands</span><br>
-        &nbsp;&nbsp;tok_def = <span class="code-num">-2</span>,<br>
-        &nbsp;&nbsp;tok_extern = <span class="code-num">-3</span>,<br>
+        &nbsp;&nbsp;<span class="code-comment">// Commands & Definitions</span><br>
+        &nbsp;&nbsp;tok_def = <span class="code-num">-2</span>, tok_extern = <span class="code-num">-3</span>,<br>
         &nbsp;&nbsp;<span class="code-comment">// Primary Entities</span><br>
-        &nbsp;&nbsp;tok_identifier = <span class="code-num">-4</span>,<br>
-        &nbsp;&nbsp;tok_number = <span class="code-num">-5</span><br>
+        &nbsp;&nbsp;tok_identifier = <span class="code-num">-4</span>, tok_number = <span class="code-num">-5</span>,<br>
+        &nbsp;&nbsp;<span class="code-comment">// Control Flow & Loops</span><br>
+        &nbsp;&nbsp;tok_if = <span class="code-num">-6</span>, tok_then = <span class="code-num">-7</span>, tok_else = <span class="code-num">-8</span>,<br>
+        &nbsp;&nbsp;tok_for = <span class="code-num">-9</span>, tok_in = <span class="code-num">-10</span>,<br>
+        &nbsp;&nbsp;<span class="code-comment">// User-Defined Operators & Variables</span><br>
+        &nbsp;&nbsp;tok_binary = <span class="code-num">-11</span>, tok_unary = <span class="code-num">-12</span>, tok_var = <span class="code-num">-13</span><br>
         };<br><br>
-        <div class="code-comment">// Scanning Rule in lexer/lexer.cpp</div>
-        <span class="code-kw">int</span> <span class="code-fn">gettok</span>() {<br>
-        &nbsp;&nbsp;<span class="code-kw">while</span> (isspace(LastChar)) LastChar = getchar();<br>
-        &nbsp;&nbsp;<span class="code-kw">if</span> (isalpha(LastChar)) { <span class="code-comment">/* def, extern, identifier */</span> }<br>
-        &nbsp;&nbsp;<span class="code-kw">if</span> (isdigit(LastChar) || LastChar == <span class="code-str">'.'</span>) { <span class="code-comment">/* number */</span> }<br>
-        &nbsp;&nbsp;<span class="code-kw">if</span> (LastChar == <span class="code-str">'#'</span>) { <span class="code-comment">/* skip comments */</span> <span class="code-kw">return</span> gettok(); }<br>
-        &nbsp;&nbsp;<span class="code-kw">if</span> (LastChar == EOF) <span class="code-kw">return</span> tok_eof;<br>
-        &nbsp;&nbsp;<span class="code-kw">int</span> ThisChar = LastChar; LastChar = getchar();<br>
-        &nbsp;&nbsp;<span class="code-kw">return</span> ThisChar; <span class="code-comment">// return ASCII '+' / '(' / ';'</span><br>
-        }
+        <div class="code-comment">// Lexical Scanner Match Dispatch in lexer/lexer.cpp</div>
+        <span class="code-kw">if</span> (IdentifierStr == <span class="code-str">"def"</span>) <span class="code-kw">return</span> tok_def;<br>
+        <span class="code-kw">if</span> (IdentifierStr == <span class="code-str">"extern"</span>) <span class="code-kw">return</span> tok_extern;<br>
+        <span class="code-kw">if</span> (IdentifierStr == <span class="code-str">"if"</span>) <span class="code-kw">return</span> tok_if;<br>
+        <span class="code-kw">if</span> (IdentifierStr == <span class="code-str">"then"</span>) <span class="code-kw">return</span> tok_then;<br>
+        <span class="code-kw">if</span> (IdentifierStr == <span class="code-str">"else"</span>) <span class="code-kw">return</span> tok_else;<br>
+        <span class="code-kw">if</span> (IdentifierStr == <span class="code-str">"for"</span>) <span class="code-kw">return</span> tok_for;<br>
+        <span class="code-kw">if</span> (IdentifierStr == <span class="code-str">"in"</span>) <span class="code-kw">return</span> tok_in;<br>
+        <span class="code-kw">if</span> (IdentifierStr == <span class="code-str">"var"</span>) <span class="code-kw">return</span> tok_var;<br>
+        <span class="code-kw">return</span> tok_identifier;
       </div>
     </div>
   </div>
