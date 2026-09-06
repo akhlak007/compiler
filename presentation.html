@@ -629,64 +629,93 @@
   </div>
 </section>
 
-<!-- SLIDE 5: Intermediate Code Rules: Quadruples & Triples -->
+<!-- SLIDE 5: Intermediate Code Representation: Quadruple Rules -->
 <section class="slide">
   <div class="glow-1"></div>
   <div class="slide-header">
     <div class="title-group">
-      <div class="category">Intermediate Representation Theory</div>
-      <h2>Quadruple & Triple Rules in Intermediate Code</h2>
+      <div class="category">Intermediate Representation</div>
+      <h2>Quadruple Rule in Intermediate Code Generation</h2>
     </div>
-    <div class="badge-tag">3-Address Code (3AC) vs. LLVM SSA</div>
+    <div class="badge-tag">3-Address Code (3AC) & LLVM SSA</div>
   </div>
 
   <div class="slide-content">
     <div class="grid-2">
-      <!-- Quadruple Rules -->
+      <!-- Quadruple Architecture -->
       <div class="card" style="border-top: 4px solid #38bdf8;">
         <div class="card-header">
           <div class="card-icon icon-blue">4</div>
-          <div class="card-title">Quadruple Rules: <code>(op, arg1, arg2, result)</code></div>
+          <div class="card-title">Quadruple Structure: <code>(op, arg1, arg2, result)</code></div>
         </div>
-        <p style="font-size: 13px; margin-bottom: 8px;">A 4-field tuple structure where the temporary result location is explicitly named:</p>
-        <table class="custom-table" style="font-size: 11.5px; margin-bottom: 10px;">
-          <thead>
-            <tr><th>Index</th><th>Operator (<code>op</code>)</th><th>Arg 1</th><th>Arg 2</th><th>Result (<code>res</code>)</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><code>(0)</code></td><td><code>FMUL</code></td><td><code>y</code></td><td><code>4.0</code></td><td><code>t1 (%multmp)</code></td></tr>
-            <tr><td><code>(1)</code></td><td><code>FADD</code></td><td><code>x</code></td><td><code>t1</code></td><td><code>t2 (%addtmp)</code></td></tr>
-            <tr><td><code>(2)</code></td><td><code>RET</code></td><td><code>t2</code></td><td><code>-</code></td><td><code>-</code></td></tr>
-          </tbody>
-        </table>
-        <p style="font-size: 12px; color: #94a3b8;"><strong>Advantage:</strong> Easy statement reordering and global optimization passes.</p>
+        <p style="font-size: 13px; margin-bottom: 8px;">Our compiler strictly adopts the <strong>Quadruple representation</strong> where every intermediate operation explicitly specifies four components:</p>
+        
+        <ul style="font-size: 12.5px; margin-bottom: 10px;">
+          <li><strong><code>op</code>:</strong> The opcode / LLVM instruction type (e.g. <code>fadd</code>, <code>fmul</code>, <code>fcmp</code>, <code>call</code>).</li>
+          <li><strong><code>arg1</code>:</strong> First input operand (variable, constant, or SSA register).</li>
+          <li><strong><code>arg2</code>:</strong> Second input operand (or <code>null</code> for unary/return).</li>
+          <li><strong><code>result</code>:</strong> Explicit named destination register (e.g. <code>%addtmp</code>, <code>%multmp</code>).</li>
+        </ul>
+
+        <div style="background: rgba(15, 23, 42, 0.7); border-radius: 8px; padding: 10px;">
+          <div style="font-weight: 700; color: #34d399; font-size: 12px; margin-bottom: 4px;">Why Quadruples in Modern LLVM?</div>
+          <p style="font-size: 12px; color: #cbd5e1;">Explicit SSA naming ensures compiler optimization passes (GVN, Dead Code Elimination) can safely reorder instructions without breaking statement index pointers.</p>
+        </div>
       </div>
 
-      <!-- Triple Rules -->
+      <!-- Quadruple Translation Table in Kaleidoscope -->
       <div class="card" style="border-top: 4px solid #c084fc;">
         <div class="card-header">
-          <div class="card-icon icon-purple">3</div>
-          <div class="card-title">Triple Rules: <code>(op, arg1, arg2)</code></div>
+          <div class="card-icon icon-purple">⚡</div>
+          <div class="card-title">Compiler Quadruple Instruction Set</div>
         </div>
-        <p style="font-size: 13px; margin-bottom: 8px;">A 3-field structure referencing intermediate values by their entry index:</p>
-        <table class="custom-table" style="font-size: 11.5px; margin-bottom: 10px;">
+        <table class="custom-table" style="font-size: 11px;">
           <thead>
-            <tr><th>Index</th><th>Operator (<code>op</code>)</th><th>Arg 1</th><th>Arg 2</th><th>Implied Value</th></tr>
+            <tr>
+              <th>Operation</th>
+              <th>Quadruple 4-Tuple</th>
+              <th>LLVM IRBuilder API Call</th>
+            </tr>
           </thead>
           <tbody>
-            <tr><td><code>(0)</code></td><td><code>FMUL</code></td><td><code>y</code></td><td><code>4.0</code></td><td>Points to <code>(0)</code></td></tr>
-            <tr><td><code>(1)</code></td><td><code>FADD</code></td><td><code>x</code></td><td><code>(0)</code></td><td>Points to <code>(1)</code></td></tr>
-            <tr><td><code>(2)</code></td><td><code>RET</code></td><td><code>(1)</code></td><td><code>-</code></td><td>Returns <code>(1)</code></td></tr>
+            <tr>
+              <td><strong>Addition</strong></td>
+              <td><code>(fadd, L, R, %addtmp)</code></td>
+              <td><code>Builder.CreateFAdd(L, R, "addtmp")</code></td>
+            </tr>
+            <tr>
+              <td><strong>Subtraction</strong></td>
+              <td><code>(fsub, L, R, %subtmp)</code></td>
+              <td><code>Builder.CreateFSub(L, R, "subtmp")</code></td>
+            </tr>
+            <tr>
+              <td><strong>Multiplication</strong></td>
+              <td><code>(fmul, L, R, %multmp)</code></td>
+              <td><code>Builder.CreateFMul(L, R, "multmp")</code></td>
+            </tr>
+            <tr>
+              <td><strong>Comparison</strong></td>
+              <td><code>(fcmp_ult, L, R, %cmptmp)</code></td>
+              <td><code>Builder.CreateFCmpULT(L, R, "cmptmp")</code></td>
+            </tr>
+            <tr>
+              <td><strong>Type Cast</strong></td>
+              <td><code>(uitofp, %cmptmp, double, %booltmp)</code></td>
+              <td><code>Builder.CreateUIToFP(L, Type, "booltmp")</code></td>
+            </tr>
+            <tr>
+              <td><strong>Function Call</strong></td>
+              <td><code>(call, @func, [Args], %calltmp)</code></td>
+              <td><code>Builder.CreateCall(CalleeF, ArgsV, "calltmp")</code></td>
+            </tr>
+            <tr>
+              <td><strong>Return</strong></td>
+              <td><code>(ret, %val, -, -)</code></td>
+              <td><code>Builder.CreateRet(RetVal)</code></td>
+            </tr>
           </tbody>
         </table>
-        <p style="font-size: 12px; color: #94a3b8;"><strong>Advantage:</strong> Compact memory representation without declaring temporary names.</p>
       </div>
-    </div>
-
-    <!-- Mapping to LLVM SSA IR -->
-    <div class="card" style="margin-top: 14px; padding: 12px 18px; background: rgba(15, 23, 42, 0.8);">
-      <div style="font-size: 13.5px; color: #34d399; font-weight: 700; margin-bottom: 4px;">🎯 LLVM SSA IR as Generalized Quadruples</div>
-      <p style="font-size: 12.5px;">LLVM IR directly implements the Quadruple model in Static Single Assignment (SSA) form: <code>%addtmp = fadd double %x, %multmp</code> corresponds precisely to the Quadruple <code>(fadd, %x, %multmp, %addtmp)</code>.</p>
     </div>
   </div>
 
