@@ -429,7 +429,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 2 / 13</div>
+    <div>Slide 2 / 14</div>
   </div>
 </section>
 
@@ -514,7 +514,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 3 / 13</div>
+    <div>Slide 3 / 14</div>
   </div>
 </section>
 
@@ -625,7 +625,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 4 / 13</div>
+    <div>Slide 4 / 14</div>
   </div>
 </section>
 
@@ -721,7 +721,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 5 / 13</div>
+    <div>Slide 5 / 14</div>
   </div>
 </section>
 
@@ -797,7 +797,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 6 / 13</div>
+    <div>Slide 6 / 14</div>
   </div>
 </section>
 
@@ -862,11 +862,84 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 7 / 13</div>
+    <div>Slide 7 / 14</div>
   </div>
 </section>
 
-<!-- SLIDE 8: Token-Rule-Based Error Handling & Recovery -->
+<!-- SLIDE 8: Semantic Analysis: Complete Semantic Rules Specification -->
+<section class="slide">
+  <div class="glow-1"></div>
+  <div class="slide-header">
+    <div class="title-group">
+      <div class="category">Semantic Validation</div>
+      <h2>Semantic Analysis: Complete Semantic Rules</h2>
+    </div>
+    <div class="badge-tag">Type Safety & Scoping Rules</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="grid-4">
+      <!-- Rule 1: Scoping -->
+      <div class="card" style="border-top: 4px solid #38bdf8;">
+        <div class="card-header">
+          <div class="card-icon icon-blue">R1</div>
+          <div class="card-title" style="font-size: 14.5px;">Scope & Binding</div>
+        </div>
+        <ul style="font-size: 12px;">
+          <li><strong>Formal Binding:</strong> Arguments are registered into <code>NamedValues</code> map on function entry.</li>
+          <li><strong>Undeclared Var Rule:</strong> Referencing undeclared identifiers triggers <code>LogErrorV("Unknown variable name")</code>.</li>
+          <li><strong>Scope Isolation:</strong> <code>NamedValues.clear()</code> guarantees clean scopes across functions.</li>
+        </ul>
+      </div>
+
+      <!-- Rule 2: Typing -->
+      <div class="card" style="border-top: 4px solid #c084fc;">
+        <div class="card-header">
+          <div class="card-icon icon-purple">R2</div>
+          <div class="card-title" style="font-size: 14.5px;">Type System</div>
+        </div>
+        <ul style="font-size: 12px;">
+          <li><strong>Double Unification:</strong> All numeric literals and expressions resolve to <code>getDoubleTy()</code>.</li>
+          <li><strong>Boolean Promotion:</strong> Comparison <code>&lt;</code> produces <code>i1</code> and is coerced to <code>double</code> via <code>CreateUIToFP</code>.</li>
+          <li><strong>Type Compatibility:</strong> Math operands must both resolve to valid <code>llvm::Value*</code>.</li>
+        </ul>
+      </div>
+
+      <!-- Rule 3: Functions -->
+      <div class="card" style="border-top: 4px solid #34d399;">
+        <div class="card-header">
+          <div class="card-icon icon-green">R3</div>
+          <div class="card-title" style="font-size: 14.5px;">Function Arity</div>
+        </div>
+        <ul style="font-size: 12px;">
+          <li><strong>Existence Precondition:</strong> Calls require callee to be declared in <code>TheModule</code>.</li>
+          <li><strong>Strict Arity Rule:</strong> Passed args must match signature: <code>CalleeF->arg_size() == Args.size()</code>.</li>
+          <li><strong>Extern Linkage:</strong> Prototypes create <code>ExternalLinkage</code> symbols.</li>
+        </ul>
+      </div>
+
+      <!-- Rule 4: Control & Invariants -->
+      <div class="card" style="border-top: 4px solid #fbbf24;">
+        <div class="card-header">
+          <div class="card-icon icon-amber">R4</div>
+          <div class="card-title" style="font-size: 14.5px;">SSA & Control Flow</div>
+        </div>
+        <ul style="font-size: 12px;">
+          <li><strong>Condition Evaluation:</strong> Conditions evaluate as truthy if $\neq 0.0$ via <code>CreateFCmpONE</code>.</li>
+          <li><strong>Phi-Node Type Matching:</strong> Both branch arms must have identical return types.</li>
+          <li><strong>Terminator Invariant:</strong> Basic blocks must end with <code>ret</code> or <code>br</code>.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
+    <div>Slide 8 / 14</div>
+  </div>
+</section>
+
+<!-- SLIDE 9: Token-Rule-Based Error Handling & Recovery -->
 <section class="slide">
   <div class="glow-2"></div>
   <div class="slide-header">
@@ -944,7 +1017,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 8 / 13</div>
+    <div>Slide 9 / 14</div>
   </div>
 </section>
 
@@ -1002,11 +1075,11 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 9 / 13</div>
+    <div>Slide 10 / 14</div>
   </div>
 </section>
 
-<!-- SLIDE 10: Target Architecture & Native Code Generation -->
+<!-- SLIDE 11: Target Architecture & Native Code Generation -->
 <section class="slide">
   <div class="glow-2"></div>
   <div class="slide-header">
@@ -1070,11 +1143,11 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 10 / 13</div>
+    <div>Slide 11 / 14</div>
   </div>
 </section>
 
-<!-- SLIDE 11: Concrete Execution Trace with Segment Breakdown -->
+<!-- SLIDE 12: Concrete Execution Trace with Segment Breakdown -->
 <section class="slide">
   <div class="glow-1"></div>
   <div class="slide-header">
@@ -1137,11 +1210,11 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 11 / 13</div>
+    <div>Slide 12 / 14</div>
   </div>
 </section>
 
-<!-- SLIDE 12: Work Plan & Future Roadmap Diagram -->
+<!-- SLIDE 13: Work Plan & Future Roadmap Diagram -->
 <section class="slide">
   <div class="glow-2"></div>
   <div class="slide-header">
@@ -1184,11 +1257,11 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 12 / 13</div>
+    <div>Slide 13 / 14</div>
   </div>
 </section>
 
-<!-- SLIDE 13: Conclusion & Q&A -->
+<!-- SLIDE 14: Conclusion & Q&A -->
 <section class="slide title-slide" style="text-align: center;">
   <div class="glow-1"></div>
   <div class="glow-2"></div>
