@@ -32,7 +32,7 @@
     page-break-after: always;
     break-after: page;
     position: relative;
-    padding: 0.7in 0.9in 0.6in 0.9in;
+    padding: 0.65in 0.9in 0.55in 0.9in;
     background: radial-gradient(circle at 10% 10%, #172033 0%, #0a0e1a 100%);
     display: flex;
     flex-direction: column;
@@ -68,15 +68,15 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 0.35in;
+    margin-bottom: 0.3in;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    padding-bottom: 0.2in;
+    padding-bottom: 0.18in;
     position: relative;
     z-index: 2;
   }
 
   .slide-header .title-group h2 {
-    font-size: 32px;
+    font-size: 30px;
     font-weight: 700;
     color: #ffffff;
     letter-spacing: -0.5px;
@@ -163,7 +163,7 @@
     background: rgba(30, 41, 59, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
-    padding: 24px;
+    padding: 22px;
     backdrop-filter: blur(12px);
     box-shadow: 0 10px 30px rgba(0,0,0,0.25);
   }
@@ -172,7 +172,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
   .card-icon {
@@ -193,15 +193,15 @@
   .icon-rose { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
 
   .card-title {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     color: #ffffff;
   }
 
   .card p, .card li {
-    font-size: 14.5px;
+    font-size: 14px;
     color: #cbd5e1;
-    line-height: 1.6;
+    line-height: 1.55;
   }
 
   .card ul {
@@ -211,14 +211,14 @@
 
   .card ul li {
     position: relative;
-    padding-left: 20px;
-    margin-bottom: 8px;
+    padding-left: 18px;
+    margin-bottom: 7px;
   }
 
   .card ul li::before {
     content: "•";
     position: absolute;
-    left: 4px;
+    left: 2px;
     color: #38bdf8;
     font-weight: bold;
     font-size: 16px;
@@ -271,7 +271,7 @@
   }
 
   .hero-title {
-    font-size: 58px;
+    font-size: 56px;
     font-weight: 800;
     line-height: 1.15;
     color: #ffffff;
@@ -283,9 +283,9 @@
   }
 
   .hero-subtitle {
-    font-size: 22px;
+    font-size: 21px;
     color: #94a3b8;
-    max-width: 900px;
+    max-width: 950px;
     line-height: 1.6;
     margin-bottom: 40px;
   }
@@ -382,69 +382,77 @@
   <div class="glow-2"></div>
   <div class="title-badge">⚡ Advanced Compiler Engineering</div>
   <h1 class="hero-title">LLVM Kaleidoscope<br>Compiler Architecture & Implementation</h1>
-  <p class="hero-subtitle">A Comprehensive Deep-Dive into Lexical Analysis, Recursive Descent Parsing, AST Design, Semantic Scoping, and LLVM IR Generation</p>
+  <p class="hero-subtitle">A Comprehensive Deep-Dive into Lexical Analysis, Recursive Descent Parsing, AST Design, Semantic Scoping, Error Handling, LLVM IR Lowering, and Target Architecture</p>
   
   <div class="meta-pills">
     <div class="pill">📁 <strong>Repository:</strong> llvm-kaleidoscope</div>
-    <div class="pill">⚙️ <strong>Backend:</strong> LLVM IR Builder & Core API</div>
+    <div class="pill">⚙️ <strong>Backend:</strong> LLVM IRBuilder & Target Machine</div>
     <div class="pill">💻 <strong>Language:</strong> C++14 / Modern OOP</div>
-    <div class="pill">🎯 <strong>Topic:</strong> Compiler Frontend & IR Lowering</div>
+    <div class="pill">🎯 <strong>Topic:</strong> Compiler Frontend, Lowering & Target Strategy</div>
   </div>
 </section>
 
-<!-- SLIDE 2: Project Overview & Motivation -->
+<!-- SLIDE 2: Project Motivation & 3 Core Objectives -->
 <section class="slide">
   <div class="glow-1"></div>
   <div class="slide-header">
     <div class="title-group">
-      <div class="category">Introduction & Scope</div>
-      <h2>Project Motivation & Objectives</h2>
+      <div class="category">Core Objectives</div>
+      <h2>Project Motivation & 3 Core Objectives</h2>
     </div>
-    <div class="badge-tag">Executive Summary</div>
+    <div class="badge-tag">Executive Focus</div>
   </div>
 
   <div class="slide-content">
     <div class="grid-3">
-      <div class="card">
+      <!-- Objective 1 -->
+      <div class="card" style="border-top: 4px solid #38bdf8;">
         <div class="card-header">
-          <div class="card-icon icon-blue">🎯</div>
-          <div class="card-title">What is Kaleidoscope?</div>
+          <div class="card-icon icon-blue">01</div>
+          <div>
+            <div class="card-title">Frontend Lexing & Parsing</div>
+            <div style="font-size: 12px; color: #38bdf8; font-weight: 600;">Objective 1 • Grammar Engine</div>
+          </div>
         </div>
-        <p>A procedural toy language designed to demonstrate complete compiler frontend architecture using the LLVM infrastructure.</p>
+        <p>Implement a high-speed, hand-written character tokenizer and hybrid <strong>Recursive Descent / Operator-Precedence Climbing Parser</strong> without relying on third-party generators (Flex/Bison).</p>
         <ul style="margin-top: 14px;">
-          <li>All numerical data are 64-bit IEEE floating point (<code>double</code>)</li>
-          <li>First-class function definitions with <code>def</code></li>
-          <li>C-style standard library binding with <code>extern</code></li>
-          <li>Pure expression-based syntax</li>
+          <li>Stateful lexical stream scanning with whitespace/comment stripping</li>
+          <li>Accurate mathematical operator precedence resolution (<code>&lt;</code>, <code>+</code>, <code>-</code>, <code>*</code>)</li>
+          <li>Grammar support for function prototypes (<code>def</code>) and C-FFI (<code>extern</code>)</li>
         </ul>
       </div>
 
-      <div class="card">
+      <!-- Objective 2 -->
+      <div class="card" style="border-top: 4px solid #c084fc;">
         <div class="card-header">
-          <div class="card-icon icon-purple">🏗️</div>
-          <div class="card-title">Engineering Goals</div>
+          <div class="card-icon icon-purple">02</div>
+          <div>
+            <div class="card-title">AST & Semantic Scoping</div>
+            <div style="font-size: 12px; color: #c084fc; font-weight: 600;">Objective 2 • AST & Type Safety</div>
+          </div>
         </div>
-        <p>Transition from language theory to practical, modular C++ implementation with LLVM toolchains:</p>
+        <p>Construct a clean, object-oriented <strong>Abstract Syntax Tree (AST)</strong> hierarchy with resilient <strong>Semantic Scoping</strong> and 4-tier error handling.</p>
         <ul style="margin-top: 14px;">
-          <li>High-speed tokenization without external tools (Flex/Lex)</li>
-          <li>Recursive Descent with Operator-Precedence parsing</li>
-          <li>Object-Oriented Abstract Syntax Tree (AST)</li>
-          <li>Direct translation to verified Static Single Assignment (SSA) LLVM IR</li>
+          <li>Polymorphic class nodes utilizing <code>std::unique_ptr</code> for safe memory management</li>
+          <li>Function-level symbol table management (<code>NamedValues</code>)</li>
+          <li>Rigorous arity checking, unknown variable tracking, and transactional IR rollback</li>
         </ul>
       </div>
 
-      <div class="card">
+      <!-- Objective 3 -->
+      <div class="card" style="border-top: 4px solid #34d399;">
         <div class="card-header">
-          <div class="card-icon icon-green">📦</div>
-          <div class="card-title">Codebase Structure</div>
+          <div class="card-icon icon-green">03</div>
+          <div>
+            <div class="card-title">LLVM IR & Target Strategy</div>
+            <div style="font-size: 12px; color: #34d399; font-weight: 600;">Objective 3 • Codegen & Target</div>
+          </div>
         </div>
-        <p>Refactored into clean, single-responsibility C++ translation units:</p>
+        <p>Lower AST constructs into verified <strong>LLVM SSA Intermediate Representation</strong> and define cross-platform <strong>Target Architecture</strong> lowering for native machine code.</p>
         <ul style="margin-top: 14px;">
-          <li><code>lexer/</code>: Token definitions and stream scanner</li>
-          <li><code>ast/</code>: 7 modular polymorphic AST class definitions</li>
-          <li><code>parser/</code>: Binary precedence & grammar engine</li>
-          <li><code>kaleidoscope/</code>: LLVM Context, Module, and Builder</li>
-          <li><code>logger/</code>: Error reporting and recovery</li>
+          <li>Direct SSA instruction generation via <code>llvm::IRBuilder&lt;&gt;</code></li>
+          <li>Automated function integrity verification via <code>llvm::verifyFunction</code></li>
+          <li>Target Machine Triple configuration and native object file (<code>.o</code> / <code>.obj</code>) emission pipeline</li>
         </ul>
       </div>
     </div>
@@ -452,11 +460,11 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 2 / 12</div>
+    <div>Slide 2 / 13</div>
   </div>
 </section>
 
-<!-- SLIDE 3: Compiler Architecture & Flowchart -->
+<!-- SLIDE 3: Compiler Architecture & Pipeline Flowchart -->
 <section class="slide">
   <div class="glow-1"></div>
   <div class="slide-header">
@@ -483,10 +491,6 @@
             <stop offset="0%" stop-color="#0d9488"/>
             <stop offset="100%" stop-color="#0f766e"/>
           </linearGradient>
-          <linearGradient id="gradAmber" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#d97706"/>
-            <stop offset="100%" stop-color="#b45309"/>
-          </linearGradient>
           <linearGradient id="gradGreen" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#16a34a"/>
             <stop offset="100%" stop-color="#15803d"/>
@@ -505,7 +509,7 @@
         </g>
 
         <!-- Arrow 1 -->
-        <path d="M 180 110 L 225 110" stroke="#38bdf8" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+        <path d="M 180 110 L 225 110" stroke="#38bdf8" stroke-width="3" fill="none"/>
         <polygon points="230,110 220,105 220,115" fill="#38bdf8"/>
 
         <!-- Stage 2: Lexer -->
@@ -544,12 +548,12 @@
         <path d="M 875 110 L 915 110" stroke="#2dd4bf" stroke-width="3" fill="none"/>
         <polygon points="920,110 910,105 910,115" fill="#2dd4bf"/>
 
-        <!-- Stage 5: Verified Module Output -->
+        <!-- Stage 5: Target Machine Output -->
         <g filter="url(#shadow)">
           <rect x="925" y="55" width="160" height="110" rx="12" fill="url(#gradGreen)" stroke="#4ade80" stroke-width="1.5"/>
           <text x="1005" y="90" text-anchor="middle" fill="#dcfce7" font-size="12" font-weight="700" letter-spacing="1">STAGE 5</text>
-          <text x="1005" y="115" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">LLVM Module</text>
-          <text x="1005" y="140" text-anchor="middle" fill="#f0fdf4" font-size="12">verifyFunction()</text>
+          <text x="1005" y="115" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">Target Machine</text>
+          <text x="1005" y="140" text-anchor="middle" fill="#f0fdf4" font-size="12">verifyFunction() & .o</text>
         </g>
       </svg>
     </div>
@@ -568,7 +572,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 3 / 12</div>
+    <div>Slide 3 / 13</div>
   </div>
 </section>
 
@@ -627,7 +631,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 4 / 12</div>
+    <div>Slide 4 / 13</div>
   </div>
 </section>
 
@@ -711,7 +715,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 5 / 12</div>
+    <div>Slide 5 / 13</div>
   </div>
 </section>
 
@@ -798,63 +802,55 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 6 / 12</div>
+    <div>Slide 6 / 13</div>
   </div>
 </section>
 
-<!-- SLIDE 7: Semantic Analysis & Symbol Scoping -->
+<!-- SLIDE 7: Semantic Analysis & Robust Error Handling -->
 <section class="slide">
   <div class="glow-1"></div>
   <div class="slide-header">
     <div class="title-group">
-      <div class="category">Semantic Validation</div>
-      <h2>Semantic Analysis & Scope Resolution</h2>
+      <div class="category">Semantic Validation & Resilience</div>
+      <h2>Semantic Analysis & Robust Error Handling</h2>
     </div>
-    <div class="badge-tag">Symbol Table & Type Strategy</div>
+    <div class="badge-tag">4-Tier Error Strategy</div>
   </div>
 
   <div class="slide-content">
-    <div class="grid-3">
+    <div class="grid-2">
+      <!-- Left Column: Scoping & Types -->
       <div class="card">
         <div class="card-header">
           <div class="card-icon icon-blue">📋</div>
-          <div class="card-title">Symbol Table Management</div>
+          <div class="card-title">Symbol Scoping & Type System</div>
         </div>
-        <p>Managed globally via <code>NamedValues</code> map:</p>
-        <div class="code-container" style="margin: 10px 0; font-size: 12px;">
-          <span class="code-type">std::map</span>&lt;<span class="code-type">string</span>, <span class="code-type">llvm::Value*</span>&gt;<br>
-          NamedValues;
-        </div>
-        <ul style="font-size: 13px;">
-          <li>Scoped per function definition</li>
-          <li>Cleared upon each new function body compilation</li>
-          <li>Populated with named function formal parameters</li>
+        <ul style="font-size: 13.5px;">
+          <li><strong>Function-Scoped Symbol Table:</strong> Managed via <code>std::map&lt;string, llvm::Value*&gt; NamedValues</code>. Cleared at the beginning of each function compilation and populated with bound formal arguments.</li>
+          <li><strong>Unified Floating-Point Domain:</strong> All expressions resolve to 64-bit IEEE double (<code>getDoubleTy</code>).</li>
+          <li><strong>Boolean Type Promotion:</strong> Comparison operations (<code>&lt;</code>) evaluate to 1-bit integers and are zero-extended to floating-point via <code>CreateUIToFP</code>.</li>
         </ul>
+
+        <div class="code-container" style="margin-top: 14px; font-size: 12px;">
+          <div class="code-comment">// Argument scope population in FunctionAST::codegen</div>
+          NamedValues.clear();<br>
+          <span class="code-kw">for</span> (<span class="code-kw">auto</span> &amp;Arg : TheFunction-&gt;args()) {<br>
+          &nbsp;&nbsp;NamedValues[Arg.getName().data()] = &amp;Arg;<br>
+          }
+        </div>
       </div>
 
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon icon-purple">🎯</div>
-          <div class="card-title">Type Checking & Domain</div>
-        </div>
-        <p>Kaleidoscope enforces a unified floating-point model:</p>
-        <ul style="margin-top: 10px; font-size: 13px;">
-          <li>All numerical expressions resolve to <code>Type::getDoubleTy(TheContext)</code>.</li>
-          <li>Boolean comparisons (<code>&lt;</code>) evaluate to 1-bit int and are immediately cast to <code>double</code> via <code>CreateUIToFP</code>.</li>
-          <li>Arity verification: Function call argument count is strictly verified against prototype signature.</li>
-        </ul>
-      </div>
-
-      <div class="card">
+      <!-- Right Column: 4-Tier Error Handling Strategy -->
+      <div class="card" style="border-left: 4px solid #f43f5e;">
         <div class="card-header">
           <div class="card-icon icon-rose">🛡️</div>
-          <div class="card-title">Error Recovery Strategy</div>
+          <div class="card-title">4-Tier Error Handling Architecture</div>
         </div>
-        <p>Robust logging prevents compiler crashes:</p>
-        <ul style="margin-top: 10px; font-size: 13px;">
-          <li><code>LogError</code>: Emits syntax errors to <code>stderr</code> and returns <code>nullptr</code>.</li>
-          <li><code>LogErrorV</code>: Catches unknown variables or incorrect argument counts during codegen.</li>
-          <li>If codegen fails, <code>TheFunction->eraseFromParent()</code> rolls back partial LLVM IR to maintain module integrity.</li>
+        <ul style="font-size: 13px;">
+          <li><strong>Tier 1 — Syntax / Lexical Trapping:</strong> <code>LogError()</code> prints diagnostic messages to <code>stderr</code> and returns <code>nullptr</code>, allowing the REPL parser to skip faulty tokens without terminating.</li>
+          <li><strong>Tier 2 — Scope Resolution Trapping:</strong> <code>LogErrorV("Unknown variable name")</code> catches undeclared identifiers in expressions and aborts the invalid branch.</li>
+          <li><strong>Tier 3 — Signature & Arity Verification:</strong> Function invocations strictly compare argument counts against registered prototype definitions (<code>CalleeF-&gt;arg_size() != Args.size()</code>).</li>
+          <li><strong>Tier 4 — Transactional Module Rollback:</strong> If codegen fails mid-body, the compiler executes <code>TheFunction-&gt;eraseFromParent()</code>, guaranteeing no corrupt partial IR pollutes the active module.</li>
         </ul>
       </div>
     </div>
@@ -862,7 +858,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 7 / 12</div>
+    <div>Slide 7 / 13</div>
   </div>
 </section>
 
@@ -914,11 +910,86 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 8 / 12</div>
+    <div>Slide 8 / 13</div>
   </div>
 </section>
 
-<!-- SLIDE 9: Step-by-Step Execution Walkthrough -->
+<!-- SLIDE 9: Target Architecture & Native Code Generation -->
+<section class="slide">
+  <div class="glow-1"></div>
+  <div class="slide-header">
+    <div class="title-group">
+      <div class="category">Hardware Target & Emission</div>
+      <h2>Target Architecture & Native Code Generation</h2>
+    </div>
+    <div class="badge-tag">LLVM TargetMachine & Object Files</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="grid-3">
+      <!-- Target Triple & Registry -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-blue">🎯</div>
+          <div class="card-title">1. Target Triple & Registry</div>
+        </div>
+        <p style="font-size: 13.5px;">Defines the target platform parameters (Architecture-Vendor-OS-Environment):</p>
+        <div class="code-container" style="margin: 10px 0; font-size: 11.5px;">
+          <span class="code-comment">// Example Target Triples</span><br>
+          <span class="code-str">"x86_64-pc-linux-gnu"</span><br>
+          <span class="code-str">"x86_64-w64-windows-msvc"</span><br>
+          <span class="code-str">"aarch64-apple-darwin"</span>
+        </div>
+        <ul style="font-size: 13px;">
+          <li><code>InitializeAllTargetInfos()</code></li>
+          <li><code>InitializeAllTargets()</code></li>
+          <li><code>InitializeAllTargetMCs()</code></li>
+          <li><code>InitializeAllAsmPrinters()</code></li>
+        </ul>
+      </div>
+
+      <!-- DataLayout & TargetMachine -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-purple">⚙️</div>
+          <div class="card-title">2. TargetMachine & Layout</div>
+        </div>
+        <p style="font-size: 13.5px;">Configures CPU capabilities, ABI conventions, and memory alignments:</p>
+        <ul style="margin-top: 10px; font-size: 13px;">
+          <li><strong>DataLayout:</strong> Dictates pointer width (32/64-bit), struct alignment, and endianness.</li>
+          <li><strong>CPU & Features:</strong> Targets specific architectures (e.g., <code>generic</code>, <code>haswell</code>, <code>m1</code>).</li>
+          <li><strong>Relocation Model:</strong> Configured for Position Independent Code (<code>Reloc::PIC_</code>) for dynamic linking.</li>
+        </ul>
+      </div>
+
+      <!-- Native Object Emission -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon icon-green">📦</div>
+          <div class="card-title">3. Object File Emission</div>
+        </div>
+        <p style="font-size: 13.5px;">Lowers LLVM IR directly into binary object files (<code>.o</code> / <code>.obj</code>):</p>
+        <div class="code-container" style="margin: 10px 0; font-size: 11.5px;">
+          <span class="code-type">legacy::PassManager</span> pass;<br>
+          <span class="code-kw">auto</span> FileType = <br>
+          &nbsp;&nbsp;CGFT_ObjectFile;<br>
+          TheTargetMachine-&gt;<br>
+          &nbsp;&nbsp;addPassesToEmitFile(<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;pass, dest, <span class="code-kw">nullptr</span>, FileType);<br>
+          pass.run(*TheModule);
+        </div>
+        <p style="font-size: 12.5px; color: #94a3b8;">Directly linkable via <code>clang</code>/<code>gcc</code>/<code>lld</code> into standalone executables.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
+    <div>Slide 9 / 13</div>
+  </div>
+</section>
+
+<!-- SLIDE 10: Step-by-Step Execution Walkthrough -->
 <section class="slide">
   <div class="glow-1"></div>
   <div class="slide-header">
@@ -988,11 +1059,11 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 9 / 12</div>
+    <div>Slide 10 / 13</div>
   </div>
 </section>
 
-<!-- SLIDE 10: Completeness & Functional Analysis -->
+<!-- SLIDE 11: Completeness & Functional Analysis -->
 <section class="slide">
   <div class="glow-2"></div>
   <div class="slide-header">
@@ -1056,11 +1127,11 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 10 / 12</div>
+    <div>Slide 11 / 13</div>
   </div>
 </section>
 
-<!-- SLIDE 11: Work Plan & Future Roadmap Diagram -->
+<!-- SLIDE 12: Work Plan & Future Roadmap Diagram -->
 <section class="slide">
   <div class="glow-1"></div>
   <div class="slide-header">
@@ -1125,11 +1196,11 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Kaleidoscope Compiler Presentation</div>
-    <div>Slide 11 / 12</div>
+    <div>Slide 12 / 13</div>
   </div>
 </section>
 
-<!-- SLIDE 12: Conclusion & Q&A -->
+<!-- SLIDE 13: Conclusion & Q&A -->
 <section class="slide title-slide" style="text-align: center;">
   <div class="glow-1"></div>
   <div class="glow-2"></div>
@@ -1139,9 +1210,9 @@
   <div class="card" style="max-width: 800px; text-align: left; margin: 0 auto 30px auto; padding: 24px;">
     <div style="font-weight: 700; color: #38bdf8; font-size: 16px; margin-bottom: 12px;">Key Project Takeaways:</div>
     <ul style="font-size: 14.5px; color: #cbd5e1;">
-      <li>Clear separation of concerns between Tokenizer, Grammar Parser, and LLVM Backend.</li>
-      <li>Efficient AST architecture with clean polymorphic C++ memory management (<code>std::unique_ptr</code>).</li>
-      <li>Demonstrates direct code generation to industrial-strength, verified LLVM Intermediate Representation.</li>
+      <li>Clear separation of concerns between Tokenizer, Grammar Parser, Semantic Analyzer, and LLVM Backend.</li>
+      <li>4-tier error handling architecture ensuring graceful REPL recovery and transactional IR rollbacks.</li>
+      <li>Production-grade lowering to verified LLVM IR and clear target architecture mapping for native binary compilation.</li>
     </ul>
   </div>
 
