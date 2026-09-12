@@ -236,11 +236,13 @@ entry:
 
 ## 📊 Presentation & Academic Report Assets
 
-This repository includes both an interactive 15-slide presentation deck and a rigorous 25-mark academic technical report adhering strictly to academic rubrics:
+This repository includes the dedicated **Presentation 3** defense slide deck, interactive presentation systems, and the 25-mark formal academic report:
 
-- 📄 **Academic Report (PDF)**: [`Kaleidoscope_Compiler_Report.pdf`](Kaleidoscope_Compiler_Report.pdf) (Times New Roman, 1,000 words sharp, APA 7th edition 2021+ citations, Appendix with code)
-- 🌐 **Academic Report (HTML)**: [`report.html`](report.html)
-- 🖥️ **Presentation Slide Deck (PDF)**: [`Kaleidoscope_Compiler_Presentation.pdf`](Kaleidoscope_Compiler_Presentation.pdf) (15 executive 16:9 slides covering pipeline, IR strategy, quadruple rules, AST, semantics, errors, memory segments, and roadmap)
+- 🎯 **Presentation 3 Defense Slide Deck (PDF)**: [`Presentation_3.pdf`](Presentation_3.pdf) (16 executive 16:9 slides specifically structured around the 15-mark rubric: Design, Semantic Analysis, IR Strategy Implementation, Executable Generation, Testing, Final Report & Demonstration)
+- 🌐 **Presentation 3 Interactive Deck (HTML)**: [`presentation_3.html`](presentation_3.html)
+- 📄 **Academic Technical Report (PDF)**: [`Kaleidoscope_Compiler_Report.pdf`](Kaleidoscope_Compiler_Report.pdf) (Times New Roman, 1,000 words sharp, APA 7th edition 2021+ citations, complete code Appendix)
+- 🌐 **Academic Report Web View (HTML)**: [`report.html`](report.html)
+- 🖥️ **Full Technical Presentation (PDF)**: [`Kaleidoscope_Compiler_Presentation.pdf`](Kaleidoscope_Compiler_Presentation.pdf)
 - 🌐 **Interactive Web Deck**: [`presentation.html`](presentation.html)
 
 ---
