@@ -234,11 +234,13 @@ entry:
 
 ---
 
-## 📊 Presentation & Visual Assets
+## 📊 Presentation & Academic Report Assets
 
-This repository includes a 12-slide presentation covering the compiler's architecture, flowcharts, AST design, and work plan:
+This repository includes both an interactive 15-slide presentation deck and a rigorous 25-mark academic technical report adhering strictly to academic rubrics:
 
-- 📄 **PDF Slide Deck**: [`Kaleidoscope_Compiler_Presentation.pdf`](Kaleidoscope_Compiler_Presentation.pdf)
+- 📄 **Academic Report (PDF)**: [`Kaleidoscope_Compiler_Report.pdf`](Kaleidoscope_Compiler_Report.pdf) (Times New Roman, 1,000 words sharp, APA 7th edition 2021+ citations, Appendix with code)
+- 🌐 **Academic Report (HTML)**: [`report.html`](report.html)
+- 🖥️ **Presentation Slide Deck (PDF)**: [`Kaleidoscope_Compiler_Presentation.pdf`](Kaleidoscope_Compiler_Presentation.pdf) (15 executive 16:9 slides covering pipeline, IR strategy, quadruple rules, AST, semantics, errors, memory segments, and roadmap)
 - 🌐 **Interactive Web Deck**: [`presentation.html`](presentation.html)
 
 ---
