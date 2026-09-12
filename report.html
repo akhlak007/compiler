@@ -254,7 +254,7 @@
       </div>
       <div class="meta-row">
         <span class="meta-label">Verified Word Count:</span>
-        <span class="meta-val"><strong>1,000 Words Sharp</strong> (Abstract: 50 | Intro: 200 | Method: 300 | Results: 300 | Conclusion: 150)</span>
+        <span class="meta-val"><strong>1,000 Words Sharp</strong> (Abstract: 50 | Intro with Objectives: 200 | Method: 300 | Results: 300 | Conclusion: 150)</span>
       </div>
       <div class="meta-row">
         <span class="meta-label">Typographic Standard:</span>
@@ -269,15 +269,16 @@
 <h1 class="sec-header">Abstract <span class="word-counter-badge">[Section Word Count: Exactly 50 Words]</span></h1>
 <p>This report presents the design and implementation of Kaleidoscope, a procedural compiler leveraging LLVM infrastructure. The pipeline incorporates an optimized lexical scanner, recursive-descent operator-precedence parser, polymorphic abstract syntax tree, symbol table scoping, and SSA intermediate representation emission. Verified execution demonstrates high-performance compilation, rigorous semantic validation, and reliable native code generation.</p>
 
-<!-- SECTION: INTRODUCTION -->
-<h1 class="sec-header">Introduction <span class="word-counter-badge">[Section Word Count: Exactly 200 Words]</span></h1>
+<!-- SECTION: INTRODUCTION WITH BACKGROUND AND OBJECTIVES -->
+<h1 class="sec-header">Introduction with Background and Objectives <span class="word-counter-badge">[Section Word Count: Exactly 200 Words]</span></h1>
 <h2 class="sub-header">Background and Theoretical Foundations</h2>
-<p>Modern compiler engineering requires translating human-readable source code into optimized, architecture-neutral intermediate representations and executable machine instructions. While classical literature established theoretical language processing principles, contemporary industrial toolchains rely upon modular compiler architectures and standardized intermediate representations to guarantee cross-platform retargetability and scalable optimization (Cooper & Torczon, 2022; Lattner et al., 2021). The Kaleidoscope language provides an expressive procedural programming environment specifically designed to illustrate the complete translation continuum, bridging high-level algorithmic expressions with low-level hardware execution models (Kumar & Sharma, 2023).</p>
+<p>Modern compiler engineering requires translating human-readable source code into optimized, architecture-neutral intermediate representations and executable machine instructions. While classical literature established formal language principles, contemporary industrial toolchains rely upon modular compilation architectures and standardized intermediate representations to guarantee cross-platform retargetability and scalable optimization (Cooper &amp; Torczon, 2022; Lattner et al., 2021). The Kaleidoscope language provides an expressive procedural environment specifically designed to demonstrate the complete translation continuum, bridging high-level algorithmic expressions with low-level hardware execution models (Kumar &amp; Sharma, 2023).</p>
+
 <h2 class="sub-header">Project Objectives</h2>
-<p>To address these foundational requirements, this project accomplishes three primary engineering objectives:
-First, it implements a robust compiler frontend comprising a hand-written character scanner and an operator-precedence recursive-descent parser capable of constructing a strongly typed, polymorphic abstract syntax tree (Chen et al., 2022).
-Second, it establishes rigorous semantic analysis and lexical scoping mechanisms using symbol table mappings to enforce variable binding rules, prototype declarations, and argument arity integrity (Muchnick & Zhao, 2023).
-Third, it synthesizes Static Single Assignment intermediate representations via LLVM IRBuilder, generating verified Quadruple representations to facilitate structural verification, foreign function interface integration, and native binary emission (Aho et al., 2021; Williams & Davis, 2025). Together, these objectives establish a complete, robust, and verified compiler framework.</p>
+<p>To address these foundational requirements, this project defines three primary engineering objectives:</p>
+<p><strong>Objective 1 (Frontend Compiler Design):</strong> Implement a robust hand-written character scanner and an operator-precedence recursive-descent parser capable of constructing a strongly typed, polymorphic abstract syntax tree representation with clean memory ownership (Chen et al., 2022).</p>
+<p><strong>Objective 2 (Scoped Semantic Analysis):</strong> Establish rigorous semantic analysis and lexical scoping mechanisms using symbol table mappings to enforce variable binding rules, prototype declarations, and argument arity integrity (Muchnick &amp; Zhao, 2023).</p>
+<p><strong>Objective 3 (IR Strategy &amp; Code Generation):</strong> Synthesize Static Single Assignment intermediate representations via modern LLVM IRBuilder, generating verified Quadruple representations to facilitate structural verification, foreign function interface integration, and native binary emission (Aho et al., 2021; Williams &amp; Davis, 2025).</p>
 
 <!-- SECTION: METHODOLOGY -->
 <h1 class="sec-header">Methodology <span class="word-counter-badge">[Section Word Count: Exactly 300 Words]</span></h1>
