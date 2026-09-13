@@ -2,7 +2,7 @@
 
 **Course:** CSE 303 – Compiler Design &bull; Military Institute of Science and Technology (MIST)  
 **Project:** Design and Development of the Kaleidoscope Compiler (LLVM-Based)  
-**Slide Reference:** [`Presentation_3.pdf`](Presentation_3.pdf) *(16 Slides &bull; 15-Mark Rubric)*  
+**Slide Reference:** [`Presentation_3.pdf`](Presentation_3.pdf) *(17 Slides &bull; 15-Mark Rubric)*  
 **Total Target Duration:** 4 Minutes *(2 Minutes per Speaker &bull; ~130 words per minute)*  
 
 ---
