@@ -239,6 +239,7 @@ entry:
 This repository includes the dedicated **Presentation 3** defense slide deck, interactive presentation systems, and the 25-mark formal academic report:
 
 - 🎯 **Presentation 3 Defense Slide Deck (PDF)**: [`Presentation_3.pdf`](Presentation_3.pdf) (16 executive 16:9 slides specifically structured around the 15-mark rubric: Design, Semantic Analysis, IR Strategy Implementation, Executable Generation, Testing, Final Report & Demonstration)
+- 🎙️ **4-Minute Defense Speech Script (2 Speakers)**: [`SPEECH_SCRIPT.md`](SPEECH_SCRIPT.md) (Simple spoken delivery text divided between Md. Akhlak Ud Jaman & Zubaer Islam Rafi)
 - 🌐 **Presentation 3 Interactive Deck (HTML)**: [`presentation_3.html`](presentation_3.html)
 - 📄 **Academic Technical Report (Word DOCX)**: [`Kaleidoscope_Compiler_Report.docx`](Kaleidoscope_Compiler_Report.docx) / [`REPORT.docx`](REPORT.docx) (MIST CSE 303 format, Authors: Md. Akhlak Ud Jaman (202414015) & Zubaer Islam Rafi (202414022), 1,000 words sharp, Appendices A–E)
 - 📄 **Academic Technical Report (PDF)**: [`Kaleidoscope_Compiler_Report.pdf`](Kaleidoscope_Compiler_Report.pdf) (Times New Roman, 1,000 words sharp, APA 7th edition 2021+ citations, complete code Appendix)
