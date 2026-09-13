@@ -9,12 +9,14 @@
 
 ## Part 1: Front-End Design & Semantic Analysis
 **Speaker 1:** Md. Akhlak Ud Jaman *(ID: 202414015)*  
-**Allocated Time:** 0:00 – 2:00 *(~260 Words)*  
-**Slides to Display:** Slide 1 to Slide 7  
+**Allocated Time:** 0:00 – 2:00 *(~270 Words)*  
+**Slides to Display:** Slide 1 to Slide 8  
 
 Good morning, respected teachers and examiners. I am **Md. Akhlak Ud Jaman**, and together with my partner **Zubaer Islam Rafi**, we are presenting our compiler project for the **Kaleidoscope** language, built using the modern **LLVM** framework. Today, we will explain how our compiler takes raw source code and turns it into real, working machine instructions.
 
-I will cover the first half of the system: the front-end design and semantic analysis. First, our **Lexer** reads the code character by character. It skips spaces and comments, and breaks the code into meaningful pieces called **tokens**. It recognizes keywords like `def` and `extern`, numbers, variable names, and math symbols. We support thirteen token types, and numbers are automatically converted into 64-bit floating-point values.
+As shown in our **Pipeline Flowchart on Slide 3**, our compiler processes code through five clear, decoupled stages: Lexical Analysis, Parsing, AST construction, Semantic Validation, and LLVM Code Generation.
+
+First, our **Lexer** reads the code character by character. It skips spaces and comments, and breaks the code into meaningful pieces called **tokens**. It recognizes keywords like `def` and `extern`, numbers, variable names, and math symbols. We support thirteen token types, and numbers are automatically converted into 64-bit floating-point values.
 
 Next is the **Parser**. We built a recursive-descent parser with **operator precedence climbing**. This solves a common math problem: order of operations. In an expression like `4 + 2 * 3`, multiplication has a higher priority of 40, while addition has 20. Our parser easily groups `2 * 3` first before adding 4, without any confusion or slow backtracking.
 
@@ -29,7 +31,7 @@ Now, my partner **Zubaer** will explain code generation, testing, and our live d
 ## Part 2: Code Generation, Testing & Demonstration
 **Speaker 2:** Zubaer Islam Rafi *(ID: 202414022)*  
 **Allocated Time:** 2:00 – 4:00 *(~270 Words)*  
-**Slides to Display:** Slide 8 to Slide 16  
+**Slides to Display:** Slide 9 to Slide 17  
 
 Thank you, Akhlak. Good morning, everyone. I am **Zubaer Islam Rafi**, and I will explain our back-end pipeline, testing, and live execution.
 
@@ -49,5 +51,5 @@ In conclusion, our compiler provides a complete, reliable translation pipeline f
 
 | Time Window | Speaker | Key Topics | Slides |
 | :--- | :--- | :--- | :--- |
-| **0:00 – 2:00** | **Md. Akhlak Ud Jaman** | Introduction &bull; Lexer & Tokens &bull; Parser & Precedence &bull; Polymorphic AST &bull; Semantic Scoping | **Slides 1–7** |
-| **2:00 – 4:00** | **Zubaer Islam Rafi** | LLVM SSA & Quadruples &bull; Target Memory Segments &bull; 4-Tier Testing (100% Pass) &bull; Live REPL & FFI &bull; Q&A | **Slides 8–16** |
+| **0:00 – 2:00** | **Md. Akhlak Ud Jaman** | Introduction &bull; Pipeline Flowchart &bull; Lexer & Tokens &bull; Parser & Precedence &bull; Polymorphic AST &bull; Semantic Scoping | **Slides 1–8** |
+| **2:00 – 4:00** | **Zubaer Islam Rafi** | LLVM SSA & Quadruples &bull; Target Memory Segments &bull; 4-Tier Testing (100% Pass) &bull; Live REPL & FFI &bull; Q&A | **Slides 9–17** |

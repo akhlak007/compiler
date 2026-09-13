@@ -357,6 +357,11 @@
     color: #cbd5e1;
   }
   .pill strong { color: #ffffff; }
+  .diagram-svg {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+  }
 </style>
 </head>
 <body>
@@ -380,7 +385,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Presentation 3 &bull; Comprehensive Project Defense</div>
-    <div>Slide 1 / 16</div>
+    <div>Slide 1 / 17</div>
   </div>
 </section>
 
@@ -431,7 +436,109 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Presentation 3 &bull; Rubric Breakdown</div>
-    <div>Slide 2 / 16</div>
+    <div>Slide 2 / 17</div>
+  </div>
+</section>
+
+
+<!-- SLIDE 3: Compiler Pipeline Architecture Flowchart -->
+<section class="slide">
+  <div class="glow-cyan"></div>
+  <div class="slide-header">
+    <div class="title-group">
+      <div class="category">System Architecture &bull; End-to-End Pipeline</div>
+      <h2>Compiler Architecture &amp; Dataflow Pipeline Flowchart</h2>
+    </div>
+    <div class="rubric-badge">Architecture Flowchart</div>
+  </div>
+
+  <div class="slide-content">
+    <div class="card" style="padding: 18px 20px; margin-bottom: 16px;">
+      <svg class="diagram-svg" viewBox="0 0 1120 190" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="gBlue" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0284c7"/><stop offset="100%" stop-color="#0369a1"/></linearGradient>
+          <linearGradient id="gPurp" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#5b21b6"/></linearGradient>
+          <linearGradient id="gAmber" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#d97706"/><stop offset="100%" stop-color="#b45309"/></linearGradient>
+          <linearGradient id="gTeal" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0d9488"/><stop offset="100%" stop-color="#0f766e"/></linearGradient>
+          <linearGradient id="gGreen" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#16a34a"/><stop offset="100%" stop-color="#15803d"/></linearGradient>
+          <filter id="sd" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000" flood-opacity="0.5"/></filter>
+        </defs>
+
+        <!-- Stage 1: Source Input -->
+        <g filter="url(#sd)">
+          <rect x="10" y="40" width="150" height="95" rx="10" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+          <text x="85" y="68" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="700">STAGE 1</text>
+          <text x="85" y="92" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="700">Source Input</text>
+          <text x="85" y="115" text-anchor="middle" fill="#38bdf8" font-family="monospace" font-size="11">stdin / REPL</text>
+        </g>
+        <path d="M 160 88 L 195 88" stroke="#38bdf8" stroke-width="3" fill="none"/>
+        <polygon points="200,88 190,83 190,93" fill="#38bdf8"/>
+
+        <!-- Stage 2: Lexer -->
+        <g filter="url(#sd)">
+          <rect x="205" y="40" width="160" height="95" rx="10" fill="url(#gBlue)" stroke="#38bdf8" stroke-width="1.5"/>
+          <text x="285" y="68" text-anchor="middle" fill="#bae6fd" font-size="10" font-weight="700">STAGE 2</text>
+          <text x="285" y="92" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="700">Lexical Scanner</text>
+          <text x="285" y="115" text-anchor="middle" fill="#e0f2fe" font-size="11">gettok() → Tokens</text>
+        </g>
+        <path d="M 365 88 L 400 88" stroke="#38bdf8" stroke-width="3" fill="none"/>
+        <polygon points="405,88 395,83 395,93" fill="#38bdf8"/>
+
+        <!-- Stage 3: Parser -->
+        <g filter="url(#sd)">
+          <rect x="410" y="40" width="170" height="95" rx="10" fill="url(#gPurp)" stroke="#c084fc" stroke-width="1.5"/>
+          <text x="495" y="68" text-anchor="middle" fill="#e9d5ff" font-size="10" font-weight="700">STAGE 3</text>
+          <text x="495" y="92" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="700">Parser + Climber</text>
+          <text x="495" y="115" text-anchor="middle" fill="#f3e8ff" font-size="11">Precedence → AST</text>
+        </g>
+        <path d="M 580 88 L 615 88" stroke="#c084fc" stroke-width="3" fill="none"/>
+        <polygon points="620,88 610,83 610,93" fill="#c084fc"/>
+
+        <!-- Stage 4: Semantic Analysis -->
+        <g filter="url(#sd)">
+          <rect x="625" y="40" width="165" height="95" rx="10" fill="url(#gAmber)" stroke="#fbbf24" stroke-width="1.5"/>
+          <text x="707" y="68" text-anchor="middle" fill="#fef3c7" font-size="10" font-weight="700">STAGE 4</text>
+          <text x="707" y="92" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="700">Semantic Check</text>
+          <text x="707" y="115" text-anchor="middle" fill="#fef9c3" font-size="11">NamedValues Map</text>
+        </g>
+        <path d="M 790 88 L 825 88" stroke="#fbbf24" stroke-width="3" fill="none"/>
+        <polygon points="830,88 820,83 820,93" fill="#fbbf24"/>
+
+        <!-- Stage 5: LLVM IRBuilder & Quadruples -->
+        <g filter="url(#sd)">
+          <rect x="835" y="40" width="170" height="95" rx="10" fill="url(#gTeal)" stroke="#2dd4bf" stroke-width="1.5"/>
+          <text x="920" y="68" text-anchor="middle" fill="#ccfbf1" font-size="10" font-weight="700">STAGE 5</text>
+          <text x="920" y="92" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="700">LLVM IRBuilder</text>
+          <text x="920" y="115" text-anchor="middle" fill="#f0fdfa" font-size="11">SSA &amp; Quadruples</text>
+        </g>
+        <path d="M 1005 88 L 1030 88" stroke="#2dd4bf" stroke-width="3" fill="none"/>
+        <polygon points="1035,88 1025,83 1025,93" fill="#2dd4bf"/>
+
+        <!-- Stage 6: Execution Engine -->
+        <g filter="url(#sd)">
+          <rect x="1040" y="40" width="70" height="95" rx="10" fill="url(#gGreen)" stroke="#4ade80" stroke-width="1.5"/>
+          <text x="1075" y="68" text-anchor="middle" fill="#dcfce7" font-size="9" font-weight="700">OUT</text>
+          <text x="1075" y="92" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">JIT</text>
+          <text x="1075" y="115" text-anchor="middle" fill="#f0fdf4" font-size="10">.o / exe</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="grid-2">
+      <div class="card" style="padding: 12px 18px; border-left: 4px solid #38bdf8;">
+        <div class="card-title" style="font-size: 14px; color: #38bdf8; margin-bottom: 4px;">🔄 End-to-End Staged Lowering</div>
+        <p style="font-size: 12.5px; line-height: 1.45;">Raw input strings flow through <strong>Tokenizer &rarr; AST &rarr; Scoped Symbol Table &rarr; SSA IR &rarr; Native Execution</strong> with strict phase decoupling and transactional rollback.</p>
+      </div>
+      <div class="card" style="padding: 12px 18px; border-left: 4px solid #34d399;">
+        <div class="card-title" style="font-size: 14px; color: #34d399; margin-bottom: 4px;">🛡️ Channel Segregation &amp; Verification</div>
+        <p style="font-size: 12.5px; line-height: 1.45;">User answers emit to <code>stdout</code>; compiler IR byte-code and error diagnostics emit to <code>stderr</code>. All functions undergo <code>llvm::verifyFunction</code> before execution.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div class="footer-left"><span class="footer-dot"></span> Presentation 3 &bull; Compiler Pipeline Flowchart</div>
+    <div>Slide 3 / 17</div>
   </div>
 </section>
 
@@ -480,7 +587,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Criterion 1: Compiler Design &bull; Lexer</div>
-    <div>Slide 3 / 16</div>
+    <div>Slide 4 / 17</div>
   </div>
 </section>
 
@@ -546,7 +653,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Criterion 1: Compiler Design &bull; Parser</div>
-    <div>Slide 4 / 16</div>
+    <div>Slide 5 / 17</div>
   </div>
 </section>
 
@@ -599,7 +706,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Criterion 1: Compiler Design &bull; AST Architecture</div>
-    <div>Slide 5 / 16</div>
+    <div>Slide 6 / 17</div>
   </div>
 </section>
 
@@ -653,7 +760,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Criterion 2: Semantic Analysis &bull; Scoped Symbol Table</div>
-    <div>Slide 6 / 16</div>
+    <div>Slide 7 / 17</div>
   </div>
 </section>
 
@@ -701,7 +808,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Criterion 2: Semantic Analysis &bull; Prototype & Arity</div>
-    <div>Slide 7 / 16</div>
+    <div>Slide 8 / 17</div>
   </div>
 </section>
 
@@ -758,7 +865,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Criterion 3: IR Strategy &bull; SSA Lowering</div>
-    <div>Slide 8 / 16</div>
+    <div>Slide 9 / 17</div>
   </div>
 </section>
 
@@ -831,7 +938,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Criterion 3: IR Strategy &bull; Quadruple Matrix</div>
-    <div>Slide 9 / 16</div>
+    <div>Slide 10 / 17</div>
   </div>
 </section>
 
@@ -875,7 +982,7 @@
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Criterion 4: Executable Generation &bull; Segments & Channels</div>
-    <div>Slide 10 / 16</div>
+    <div>Slide 11 / 17</div>
   </div>
 </section>
 
@@ -931,7 +1038,7 @@ pass.<span class="code-fn">run</span>(*TheModule);
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Criterion 4: Executable Generation &bull; Object Emission</div>
-    <div>Slide 11 / 16</div>
+    <div>Slide 12 / 17</div>
   </div>
 </section>
 
@@ -990,7 +1097,7 @@ pass.<span class="code-fn">run</span>(*TheModule);
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Criterion 5: Testing &bull; 4-Tier Error Handling</div>
-    <div>Slide 12 / 16</div>
+    <div>Slide 13 / 17</div>
   </div>
 </section>
 
@@ -1061,7 +1168,7 @@ pass.<span class="code-fn">run</span>(*TheModule);
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Criterion 5: Testing &bull; Regression Matrix</div>
-    <div>Slide 13 / 16</div>
+    <div>Slide 14 / 17</div>
   </div>
 </section>
 
@@ -1119,7 +1226,7 @@ Evaluated to: <span class="code-num">49.000000</span>
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Criterion 6: Demonstration &bull; Live REPL Execution</div>
-    <div>Slide 14 / 16</div>
+    <div>Slide 15 / 17</div>
   </div>
 </section>
 
@@ -1181,7 +1288,7 @@ Evaluated to: <span class="code-num">1.000000</span>
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Criterion 6: Demonstration &bull; FFI & Academic Report</div>
-    <div>Slide 15 / 16</div>
+    <div>Slide 16 / 17</div>
   </div>
 </section>
 
@@ -1224,7 +1331,7 @@ Evaluated to: <span class="code-num">1.000000</span>
 
   <div class="slide-footer">
     <div class="footer-left"><span class="footer-dot"></span> Presentation 3 &bull; Questions & Evaluation Discussion</div>
-    <div>Slide 16 / 16</div>
+    <div>Slide 17 / 17</div>
   </div>
 </section>
 
